@@ -119,6 +119,25 @@ python fetch_ipo.py          # writes ipo.json + history.json
 python -m http.server 8630   # open http://localhost:8630
 ```
 
+## Claude skill: ipo-decision-desk
+
+`skills/ipo-decision-desk/` packages this whole project as a Claude skill: the decision method
+(six-factor listing call, allotment odds, bear/base/bull, research grade), the backtest findings,
+the data sources and their gotchas, the operations manual and the design decisions.
+
+- **Install in Claude Code:** copy the `skills/ipo-decision-desk` folder to `~/.claude/skills/`.
+- **Install in Claude.ai / desktop:** upload `skills/ipo-decision-desk.skill` under Settings > Capabilities > Skills.
+- **Use:** ask things like "which IPOs should I apply for today?", "explain the Tonbo call",
+  "is GMP reliable for SME?" or "change the refresh to every 2 hours".
+- **Terminal report** (no Claude needed):
+
+```bash
+node skills/ipo-decision-desk/scripts/ipo_report.js --live
+```
+
+Options: `--repo .` (use local files and engine), `--ipo <name>`, `--segment SME|Mainboard`, `--json`.
+When `decide.js` or `backtest.js` change, copy them into `skills/ipo-decision-desk/scripts/engine/`.
+
 ## If a source breaks
 
 The Action goes red only when *no* GMP source answers; a single broken source just shows a
