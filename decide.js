@@ -98,7 +98,7 @@
       const inc = fin["Total Income"], pat = fin["Profit After Tax"] || [], nw = fin["NET Worth"] || [], debt = fin["Total Borrowing"] || [];
       const [a, b] = cols, growth = inc[b] ? (inc[a] / inc[b] - 1) * 100 : null, margin = inc[a] ? pat[a] / inc[a] * 100 : null;
       const roe = ins.kpi_fy && ins.kpi_fy.ROE != null ? ins.kpi_fy.ROE : nw[a] ? pat[a] / nw[a] * 100 : null;
-      const de = nw[a] ? debt[a] / nw[a] : null;
+      const de = nw[a] && debt[a] != null ? debt[a] / nw[a] : null;
       const parts = [growth == null ? null : growth >= 20 ? 1 : growth >= 0 ? 0.6 : 0.2, margin == null ? null : margin >= 10 ? 1 : margin >= 0 ? 0.5 : 0,
         roe == null ? null : roe >= 15 ? 1 : roe >= 8 ? 0.6 : 0.3, de == null ? null : de < 0.5 ? 1 : de < 1.5 ? 0.6 : 0.2].filter((x) => x != null);
       F("fundamentals", parts.reduce((s, x) => s + x, 0) / parts.length,
