@@ -120,6 +120,15 @@ def parse_detail(h: str) -> dict:
             if r[0].startswith("Promoter") and len(r) >= 3:
                 d["promoter_pre"], d["promoter_post"] = num(r[1]), num(r[2])
 
+    flat = re.sub(r"\s+", " ", html.unescape(TAG.sub(" ", re.sub(r"<script.*?</script>", "", h, flags=re.S))))
+    m = re.search(r"Objects of the Issue (.{20,900}?)(?: Key Performance Indicator| KPI | Check IPO|$)", flat)
+    if m:
+        obj = m.group(1).strip()
+        low = obj.lower()
+        d["objects"] = obj[:600]
+        d["uses"] = [k for k, words in (("debt", ("repay", "prepay", "borrowing", "debt")), ("capex", ("capital expenditure", "capex", "plant", "machinery", "facility", "expansion")),
+                                         ("working_capital", ("working capital",)), ("acquisition", ("acquisition", "inorganic")), ("general", ("general corporate",)),
+                                         ("ofs_only", ("100% offer for sale", "will not receive any"))) if any(w in low for w in words)]
     rv = find(tabs, "Review By")
     if rv:
         for r in rv[1:]:
@@ -140,6 +149,21 @@ def parse_subscription(h: str) -> dict:
     a = next((t for t in tabs if any(r and r[0] == "Bid Date" for r in t)), None)
     if a:
         d["anchor"] = True
+    book = next((t for t in tabs if t and "Group Entity" in t[0] and "% Allocated" in t[0]), None)
+    if book:
+        rows = [r for r in book[1:] if len(r) >= 6 and r[0].strip().isdigit()]
+        pct = lambda r: num(r[5]) or 0.0  # noqa: E731
+        grp = lambda r: (r[2] or r[1]).upper()  # noqa: E731
+        foreign = ("GOLDMAN", "MORGAN STANLEY", "NOMURA", "SOCIETE GENERALE", "BNP", "HSBC", "CITIGROUP", "JPMORGAN", "J.P. MORGAN", "FIDELITY", "GOVERNMENT OF SINGAPORE",
+                   "MONETARY AUTHORITY", "ABU DHABI", "NORGES", "BLACKROCK", "VANGUARD", "UBS", "BARCLAYS", "AMUNDI", "NATIXIS", "EASTSPRING", "ASHOKA", "TEMASEK", "KUWAIT")
+        d["anchor_book"] = {
+            "n": len(rows),
+            "mf_pct": round(sum(pct(r) for r in rows if "MUTUAL FUND" in grp(r)), 1),
+            "insurance_pct": round(sum(pct(r) for r in rows if "INSURANCE" in grp(r) or "LIFE" in grp(r)), 1),
+            "foreign_pct": round(sum(pct(r) for r in rows if any(k in grp(r) for k in foreign)), 1),
+            "houses": sorted({(r[2] or r[1]).title() for r in rows})[:12],
+            "top": [{"name": r[1].title(), "group": (r[2] or "").title(), "pct": pct(r)} for r in sorted(rows, key=pct, reverse=True)[:5]],
+        }
     dates = next((t for t in tabs if any(r and "Basis of Allotment" in r[0] for r in t)), None)
     if dates:
         for r in dates:

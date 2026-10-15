@@ -63,6 +63,16 @@
 .fac:last-child{border-bottom:0}
 .fac .note{grid-column:2/-1;color:var(--ink-3);font-size:12px}
 .fac .w{color:var(--ink-3);font-size:12px;text-align:right}
+.rgrade{display:grid;grid-template-columns:auto 1fr auto;gap:16px;align-items:center;padding:14px 16px;border:1px solid var(--line);border-radius:var(--r);margin-bottom:10px}
+.rgrade .gnum{font:500 40px/1 var(--serif)}.rgrade .gnum span{font-size:18px;color:var(--ink-3)}
+.rgrade .glabel{font:500 16px var(--serif)}
+.rgrade .lt{text-align:right;max-width:200px}.rgrade .lt b{font:600 16px var(--sans);display:block}
+.rgrade .lt.pos b{color:var(--good)}.rgrade .lt.neg b{color:var(--bad)}
+@media (max-width:520px){.rgrade{grid-template-columns:auto 1fr}.rgrade .lt{grid-column:1/-1;text-align:left;max-width:none}}
+.vbox{margin-top:12px;padding:12px 14px;background:var(--surface-2);border-radius:var(--r-sm)}
+.vlabel{font-size:14px}.vlabel b{font-weight:600}
+.mults{display:grid;grid-template-columns:repeat(auto-fit,minmax(90px,1fr));gap:10px;margin-top:10px}
+.mults div{display:flex;flex-direction:column;font-size:12px}.mults b{font:500 18px var(--serif);color:var(--ink)}.mults small{color:var(--ink-3)}
 .d-actions{display:flex;gap:10px;flex-wrap:wrap;margin-top:28px;padding-top:18px;border-top:1px solid var(--line)}
 
 /* record section */
@@ -222,7 +232,7 @@ async function loadStatic() {
   const bust = "?t=" + Math.floor(Date.now() / 6e5);
   const [a, i] = await Promise.allSettled([fetch("archive.json" + bust).then((r) => r.json()), fetch("insights.json" + bust).then((r) => r.json())]);
   if (a.status === "fulfilled") { S.archive = a.value.records || []; S.recById = new Map(S.archive.map((r) => [r.id, r])); S.rows = B.ledger(S.archive, cfg()); }
-  if (i.status === "fulfilled") { S.ins = i.value.ipos || {}; S.insByIg = new Map(Object.values(S.ins).filter((v) => v.ig_id).map((v) => [v.ig_id, v])); }
+  if (i.status === "fulfilled") { S.ins = i.value.ipos || {}; S.insByIg = new Map(Object.values(S.ins).filter((v) => v.ig_id).map((v) => [v.ig_id, v])); S.cuts = D.gradeCuts(Object.values(S.ins)); }
 }
 async function loadLive() {
   const [y, m] = todayIST().split("-").map(Number);
@@ -260,7 +270,7 @@ function compose() {
     p.st = statusOf(p, t); p.trend = trendOf(p);
     p.pctv = p.price && p.gmp != null ? p.gmp / p.price * 100 : p.gmp_pct;
     p.ins = (p.ig_id && S.insByIg.get(p.ig_id)) || (p.ch_id && S.ins[String(p.ch_id)]) || null;
-    if (p.st !== "listed") p.call = D.decide(p, p.ins, S.rows, c, t);
+    if (p.st !== "listed") { p.call = D.decide(p, p.ins, S.rows, c, t); p.research = D.research(p, p.ins, S.cuts); }
     return p;
   });
 }
@@ -285,6 +295,8 @@ function recommendation(p) {
   if (pos.length) s += ` In its favour: ${pos.join("; ")}.`;
   if (neg.length) s += ` Against it: ${neg.join("; ")}.`;
   if (c.verdict === "LOTTERY" && c.ev != null) s += ` At ${oddsText(c.odds).toLowerCase()} odds, the expected gain per application is only ${inr(c.ev)}.`;
+  const r = p.research;
+  if (r && r.grade) s += ` For holding beyond listing, the research view is ${r.longTerm.call.toLowerCase()}: ${r.longTerm.why.charAt(0).toLowerCase() + r.longTerm.why.slice(1)}.`;
   return s;
 }
 
@@ -317,7 +329,7 @@ function renderToday(t) {
 function row(p, t) {
   const c = p.call, s = c.scenarios, sme = p.segment === "SME", hot = p.st === "open" && p.close === t;
   return `<button class="row ${c.verdict === "SKIP" || c.verdict === "CLOSED" ? "dim" : ""}" type="button" data-open="${esc(p.id)}" aria-label="${esc(p.name)}: ${LABEL[c.verdict]}. Open analysis">
-    <div><span class="tag t-${c.verdict}">${LABEL[c.verdict]}</span><div class="score">Score ${c.score ?? "—"} / 100</div></div>
+    <div><span class="tag t-${c.verdict}">${LABEL[c.verdict]}</span><div class="score">Score ${c.score ?? "—"}${p.research && p.research.grade ? ` · <span title="Fundamental grade within its segment">Grade ${p.research.grade}/5</span>` : ""}</div></div>
     <div><div class="name">${esc(p.name)}</div><div class="meta"><span class="chip ${sme ? "sme" : ""}">${sme ? esc(p.exchange || "SME") : "Mainboard"}</span>${band(p) ? `<span class="num">${band(p)}</span>` : ""}<span class="${hot ? "hot" : ""}">${esc(when(p, t))}</span>${S.plan.has(p.id) ? `<span class="pos">${ICON.check} In plan</span>` : ""}</div></div>
     <div class="v num"><b>${p.gmp == null ? "—" : inr(p.gmp)}</b><small>${p.pctv == null ? "no quote yet" : pc(p.pctv) + (p.trend > 0 ? ", rising" : p.trend < 0 ? ", falling" : "")}</small></div>
     <div class="v num"><b>${oddsText(c.odds)}</b><small>${esc(c.odds.basis)}</small></div>
@@ -367,11 +379,34 @@ function drawerIPO(p) {
       <div><div class="l">Expected per application</div><div class="v ${sg(c.ev)}">${c.ev == null ? "—" : inr(c.ev)}</div><div class="h">odds × base case, after charges</div></div>
       <div><div class="l">Minimum application</div><div class="v">${c.invested ? inr(c.invested) : "—"}</div><div class="h">${p.lot ? (sme ? "2 lots of " : "1 lot of ") + p.lot + " shares" : ""}</div></div></div>
     ${range}
-    <div class="d-sec"><h4>What drives the call</h4><ul class="why">${c.reasons.slice(0, 6).map((r) => `<li><span class="${r.kind === "+" ? "p" : "m"}">${r.kind === "+" ? ICON.plus : ICON.minus}</span><span>${esc(r.t)}</span></li>`).join("") || '<li class="muted">Not enough data yet.</li>'}</ul></div>
+    ${researchHtml(p)}
+    <div class="d-sec"><h4>What drives the listing call</h4><ul class="why">${c.reasons.slice(0, 6).map((r) => `<li><span class="${r.kind === "+" ? "p" : "m"}">${r.kind === "+" ? ICON.plus : ICON.minus}</span><span>${esc(r.t)}</span></li>`).join("") || '<li class="muted">Not enough data yet.</li>'}</ul></div>
     <div class="d-sec"><h4>Score breakdown · weight</h4>${facs}</div>
     <div class="d-sec"><h4>Demand and structure</h4><p style="margin:0;font-size:14px">${esc(demand)}${ins.issue_size_cr ? ` · issue ₹${Math.round(ins.issue_size_cr).toLocaleString("en-IN")} Cr, ${Math.round((ins.fresh_cr || 0) / ins.issue_size_cr * 100)}% fresh` : ""}${ins.promoter_post ? ` · promoters ${ins.promoter_pre}% → ${ins.promoter_post}%` : ""}${ins.mcap_cr ? ` · market cap ₹${Math.round(ins.mcap_cr).toLocaleString("en-IN")} Cr` : ""}</p></div>
     ${finT}${prec}
     <div class="d-actions"><button class="btn ${S.plan.has(p.id) ? "" : "primary"}" type="button" data-plan="${esc(p.id)}">${S.plan.has(p.id) ? ICON.check + " In your plan" : ICON.plus + " Add to plan"}</button>${link ? `<a class="btn" href="${link}" target="_blank" rel="noopener">Prospectus details ${ICON.ext}</a>` : ""}</div>`;
+}
+function researchHtml(p) {
+  const r = p.research, ins = p.ins || {};
+  if (!r) return "";
+  const v = r.valuation || {}, sp = r.sponsorship || {}, PN = { growth: "Growth", profitability: "Profitability", balance: "Balance sheet", governance: "Governance & issue" };
+  const tone = r.longTerm.call === "Positive" ? "pos" : r.longTerm.call === "Cautious" ? "neg" : "";
+  const bars = Object.keys(D.PILLARS).map((k) => { const f = r.pillars[k];
+    if (!f) return `<div class="fac"><span class="muted">${PN[k]}</span><div class="meter"></div><span class="w">${D.PILLARS[k]}</span><span class="note">Not disclosed</span></div>`;
+    const col = f.s >= 0.65 ? "var(--good)" : f.s >= 0.4 ? "var(--gold)" : "var(--bad)";
+    return `<div class="fac"><span>${PN[k]}</span><div class="meter"><i style="width:${Math.round(f.s * 100)}%;background:${col}"></i></div><span class="w">${D.PILLARS[k]}</span><span class="note">${esc(f.note)}</span></div>`; }).join("");
+  const mult = [v.pe ? ["P/E", v.pe.toFixed(1) + "x", v.peerMed ? `sector IPOs ${v.peerMed.toFixed(0)}x` : ""] : null, v.evEbitda ? ["EV/EBITDA", v.evEbitda.toFixed(1) + "x", ""] : null,
+    v.peg ? ["PEG", v.peg.toFixed(2), "P/E ÷ profit growth"] : null, v.pb ? ["P/B", v.pb.toFixed(1) + "x", ""] : null].filter(Boolean);
+  const cons = sp.consensus, consTxt = cons ? `${cons.subscribe} subscribe · ${cons.may_apply} may apply · ${cons.neutral} neutral · ${cons.avoid} avoid` : "No broker notes yet";
+  const anchors = sp.anchors ? `${sp.anchors} anchors · ${Math.round(sp.longOnly)}% mutual funds and insurers${sp.foreign ? ` · ${Math.round(sp.foreign)}% marquee foreign funds` : ""}` : "Anchor book not yet allotted";
+  return `<div class="d-sec research"><h4>Research view · long term</h4>
+    <div class="rgrade"><div class="gnum">${r.grade ?? "—"}<span>/5</span></div><div><div class="glabel">${r.grade ? D.GRADE[r.grade] + " fundamentals" : "Not graded"}</div><div class="muted" style="font-size:12.5px">${r.relative ? "Graded against recent " + (p.segment === "SME" ? "SME" : "mainboard") + " IPOs" : "Absolute scale"}</div></div>
+      <div class="lt ${tone}"><div class="muted" style="font-size:12px">Long-term view</div><b>${esc(r.longTerm.call)}</b><div style="font-size:12px" class="soft">${esc(r.longTerm.why)}</div></div></div>
+    ${bars}
+    <div class="vbox"><div class="vlabel">Valuation: <b>${esc(v.label || "Not enough data")}</b></div>${mult.length ? `<div class="mults num">${mult.map(([a, b, c]) => `<div><span class="muted">${a}</span><b>${b}</b><small>${c}</small></div>`).join("")}</div>` : ""}</div>
+    ${r.notes.length ? `<ul class="why" style="margin-top:14px">${r.notes.slice(0, 5).map((n) => `<li><span class="${n.kind === "+" ? "p" : "m"}">${n.kind === "+" ? ICON.plus : ICON.minus}</span><span>${esc(n.t)}</span></li>`).join("")}</ul>` : ""}
+    <p style="margin:14px 0 0;font-size:13.5px"><span class="muted">Anchor book:</span> ${esc(anchors)}<br><span class="muted">Broker notes:</span> ${esc(consTxt)}${ins.objects ? `<br><span class="muted">Use of proceeds:</span> ${esc(ins.objects.length > 220 ? ins.objects.slice(0, 220) + "…" : ins.objects)}` : ""}</p>
+  </div>`;
 }
 function drawerPlan() {
   const t = todayIST(), acc = cfg().accounts;

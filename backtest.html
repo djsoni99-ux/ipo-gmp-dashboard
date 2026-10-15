@@ -78,7 +78,7 @@ details.disclose[open]>summary svg{transform:rotate(90deg)}
     <aside class="toc" aria-label="Contents"><div class="kicker">Contents</div>
       <ol><li><a href="#q1" data-toc="q1"><span class="n">1</span>Did the calls work?</a></li><li><a href="#q2" data-toc="q2"><span class="n">2</span>Rules that paid</a></li>
         <li><a href="#q3" data-toc="q3"><span class="n">3</span>What drives gains</a></li><li><a href="#q4" data-toc="q4"><span class="n">4</span>Trusting GMP</a></li>
-        <li><a href="#method" data-toc="method"><span class="n">5</span>Method &amp; settings</a></li></ol></aside>
+        <li><a href="#q5" data-toc="q5"><span class="n">5</span>Research grade</a></li><li><a href="#method" data-toc="method"><span class="n">6</span>Method &amp; settings</a></li></ol></aside>
 
     <div>
       <section class="chapter" id="q1" aria-labelledby="q1h">
@@ -112,8 +112,15 @@ details.disclose[open]>summary svg{transform:rotate(90deg)}
         </div>
       </section>
 
+      <section class="chapter" id="q5" aria-labelledby="q5h">
+        <div class="ch-n">05</div><h2 id="q5h">Does the research grade help?</h2>
+        <p class="answer" id="resAnswer"></p>
+        <div class="scroll-x"><table class="tbl" id="resTable"></table></div>
+        <p class="note">The grade follows how established evaluators work: CRISIL's IPO grading (business and financial prospects, management, governance, graded 1 to 5 relative to other listed companies and explicitly not a price opinion); Renaissance Capital (fundamentals, governance, valuation against listed peers, insider selling); and Indian broker IPO notes (valuation against peers as the main reason to avoid, growth and return on capital as the reason to pay up). Pillars: growth 30, profitability 30, balance sheet 15, governance and issue structure 25. Grades are quintiles within each segment. "After listing" compares the latest price with the listing-day close, from Chittorgarh's sector tables; it covers only part of the sample and a few weeks of trading.</p>
+      </section>
+
       <section class="chapter" id="method" aria-labelledby="mh">
-        <div class="ch-n">05</div><h2 id="mh">Method and settings</h2>
+        <div class="ch-n">06</div><h2 id="mh">Method and settings</h2>
         <ul class="notes" style="padding-left:18px;margin:0">
           <li><b>The trade.</b> Apply at the upper band. If allotted, sell at the listing price less slippage (mainboard 0.5%, SME 2%), after STT, exchange, GST and DP charges. Short-term gains tax of 20.8% is netted per financial year. Cash is blocked from the bid day until the refund (two working days) or the sale proceeds (listing plus one day).</li>
           <li><b>Allotment odds.</b> 1 &divide; retail subscription where known, otherwise total subscription. Application counts are not published, so true odds may be somewhat better.</li>
@@ -298,11 +305,39 @@ function renderForm() {
   $("form").innerHTML = F.map(([k, l]) => `<label>${l}<input data-k="${k}" type="number" step="any" value="${esc(U[k])}"></label>`).join("")
     + `<label class="chk"><input data-c="applyTax" type="checkbox" ${U.applyTax ? "checked" : ""}> Apply tax</label>`;
 }
+function renderResearch() {
+  const byId = new Map(ROWS.map((r) => [r.id, r])), cuts = D.gradeCuts(Object.values(INS));
+  const norm = (s) => s.toLowerCase().replace(/ (ltd|limited)\.?$/, "").replace(/[^a-z0-9]/g, "");
+  const ltp = {};
+  for (const v of Object.values(INS)) for (const x of v.precedents || []) if (x.ltp && x.listing_close) ltp[norm(x.name)] = x;
+  const rows = [];
+  for (const v of Object.values(INS)) {
+    const r = byId.get(v.ig_id);
+    if (!r || r.gainPct == null || !inTab(r.segment)) continue;
+    const R = D.research({ segment: r.segment }, v, cuts);
+    if (!R.grade) continue;
+    const L = ltp[norm(v.name)];
+    rows.push({ grade: R.grade, call: R.longTerm.call, gain: r.gainPct, after: L ? (L.ltp / L.listing_close - 1) * 100 : null });
+  }
+  const grp = [["Grade 4–5", (x) => x.grade >= 4], ["Grade 3", (x) => x.grade === 3], ["Grade 1–2", (x) => x.grade <= 2], ["View: Positive", (x) => x.call === "Positive"], ["View: Neutral", (x) => x.call === "Neutral"], ["View: Cautious", (x) => x.call === "Cautious"]]
+    .map(([label, fn]) => { const l = rows.filter(fn), a = l.filter((x) => x.after != null), avg = (arr, f) => arr.length ? arr.reduce((s, x) => s + f(x), 0) / arr.length : null;
+      return { label, n: l.length, up: l.length ? l.filter((x) => x.gain > 0).length / l.length : null, avg: avg(l, (x) => x.gain), na: a.length, after: avg(a, (x) => x.after), afterUp: a.length ? a.filter((x) => x.after > 0).length / a.length : null }; });
+  $("resTable").innerHTML = `<thead><tr><th>Group</th><th>IPOs</th><th>Listed higher</th><th>Average listing</th><th>Tracked after listing</th><th>Move since listing</th><th>Still above listing</th></tr></thead><tbody>`
+    + grp.filter((g) => g.n).map((g) => `<tr><td>${g.label}</td><td class="num">${g.n}</td><td class="num">${pr(g.up)}</td><td class="num ${sg(g.avg)}">${pc(g.avg)}</td><td class="num">${g.na}</td><td class="num ${sg(g.after)}">${g.na ? pc(g.after) : "—"}</td><td class="num">${g.na ? pr(g.afterUp) : "—"}</td></tr>`).join("") + "</tbody>";
+  const hi = grp[0], lo = grp[2];
+  const d = hi.up != null && lo.up != null ? hi.up - lo.up : null;
+  const after = grp.slice(0, 3).filter((g) => g.na >= 3), allDown = after.length && after.every((g) => g.after < 0);
+  const lead = d == null ? "" : d >= 0.15 ? "<b>Yes, clearly at listing.</b>" : d >= 0.05 ? "<b>Modestly, at listing.</b>" : "<b>Not in this segment.</b>";
+  $("resAnswer").innerHTML = !rows.length || d == null ? (rows.length ? `${rows.length} graded IPOs so far; see the table.` : "There are not yet enough analysed IPOs in this segment.")
+    : `${lead} Across ${rows.length} recent ${who()}IPOs, grade 4–5 issues listed higher ${pr(hi.up)} of the time (avg ${pc(hi.avg)}) against ${pr(lo.up)} (avg ${pc(lo.avg)}) for grade 1–2.`
+      + (d < 0.05 && TAB === "SME" ? " SME financials are small, recent and often flattered before listing, so fundamentals carry less signal here; lean on GMP and demand instead." : "")
+      + ` After listing, ${allDown ? "every group drifted lower in the first weeks" : "the picture is mixed"} and the samples are too small to separate them. That matches CRISIL's own caveat: a fundamental grade is not a price call. Use it to decide what to <i>keep</i> after listing.`;
+}
 function renderAll() {
   ROWS = B.ledger(ARCH, cfg());
   renderTabs();
   const val = renderCalls();
-  renderVerdict(val); renderRules(); renderDrivers(); renderGmp();
+  renderVerdict(val); renderRules(); renderDrivers(); renderGmp(); renderResearch();
 }
 
 document.addEventListener("click", (e) => {
@@ -325,7 +360,7 @@ $("csvBtn").addEventListener("click", () => {
   setTimeout(() => URL.revokeObjectURL(a.href), 2000);
 });
 const io = new IntersectionObserver((es) => es.forEach((en) => { if (en.isIntersecting) document.querySelectorAll("[data-toc]").forEach((a) => a.classList.toggle("on", a.dataset.toc === en.target.id)); }), { rootMargin: "-30% 0px -60% 0px" });
-["q1", "q2", "q3", "q4", "method"].forEach((id) => io.observe($(id)));
+["q1", "q2", "q3", "q4", "q5", "method"].forEach((id) => io.observe($(id)));
 
 renderForm();
 const bust = "?t=" + Math.floor(Date.now() / 6e5);

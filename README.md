@@ -70,6 +70,25 @@ The **last 30 days** panel shows, for every listing, the GMP path, GMP at close 
 listing gain, the miss, retail subscription, allotment odds, and the realistic (odds-weighted) return versus the
 "allotted every time" number most GMP sites imply.
 
+## Research view (long term)
+
+Alongside the listing call, every IPO gets a research view modelled on how established evaluators work:
+CRISIL IPO grading (business and financial prospects, management, governance; graded 1-5 *relative* to other
+listed companies; not a price opinion), Renaissance Capital (fundamentals, governance, valuation against listed
+peers, insider selling) and Indian broker IPO notes (valuation against peers is the main avoid trigger; growth and
+ROCE justify a premium; use of proceeds and promoter exits are scrutinised).
+
+- **Grade 1-5**: growth 30, profitability 30, balance sheet 15, governance and issue structure 25; quintiles within
+  each segment. Profit or revenue surges into the IPO are flagged and capped, not rewarded.
+- **Valuation verdict**: P/E against recent same-sector IPOs, EV/EBITDA, PEG, P/B -> discount / in line / premium /
+  stretched (a premium can be "growth-justified" when PEG < 1.2 and ROCE >= 20%).
+- **Sponsorship**: anchor-book composition (mutual funds and insurers vs marquee foreign funds) and broker consensus
+  also feed the listing call's demand factor.
+- **Long-term view**: Positive / Neutral / Cautious.
+
+Backtest chapter 5 checks it: on recent mainboard IPOs, grade 4-5 issues listed higher far more often than grade
+1-2; on SME there is no edge, and after listing no group stands out yet.
+
 ## What the dashboard adds beyond a GMP table
 
 - **Decision cards** for open / upcoming IPOs: GMP, subscription meter with allotment odds (~1 in N), expected value

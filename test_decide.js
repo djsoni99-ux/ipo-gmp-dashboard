@@ -59,4 +59,42 @@ t("valuation discount to precedents scores higher than premium", () => {
   assert.ok(cheap > rich);
 });
 
+t("research: strong compounder at a discount -> high grade, Positive", () => {
+  const ins = Object.assign({}, strongIns, { kpi_fy: { ROE: 24, ROCE: 30, "PAT Margin": 14, "EBITDA Margin": 22 }, promoter_post: 62, uses: ["capex"], mcap_cr: 2000,
+    financials: { periods: ["31 Mar 2026", "31 Mar 2025", "31 Mar 2024"], "Total Income": [160, 125, 100], "Profit After Tax": [24, 17, 12], EBITDA: [36, 27, 20],
+      "NET Worth": [120, 95, 80], "Total Borrowing": [10, 15, 20] } });
+  const r = D.research(base, ins);
+  assert.ok(r.grade >= 4, "grade " + r.grade);
+  assert.equal(r.longTerm.call, "Positive");
+  assert.equal(r.valuation.label, "Discount to peers");
+  assert.ok(Math.abs(r.valuation.evEbitda - (2000 + 10) / 36) < 1e-9);
+});
+
+t("research: profit surge into the IPO is flagged, not rewarded", () => {
+  const ins = { financials: { periods: ["31 Mar 2026", "31 Mar 2025"], "Total Income": [100, 90], "Profit After Tax": [12, 2], "NET Worth": [40, 30], "Total Borrowing": [5, 5] },
+    kpi_fy: { ROE: 30, ROCE: 35, "PAT Margin": 12 }, pe_post: 14 };
+  const r = D.research(base, ins);
+  assert.ok(r.notes.some((n) => n.kind === "-" && /check it is sustainable/.test(n.t)));
+  assert.ok(r.pillars.growth.s <= 0.6);
+  assert.equal(r.valuation.peg, null);
+});
+
+t("research: loss-making, OFS-only, leveraged -> Cautious; December year-ends recognised", () => {
+  const ins = { loss_making: true, issue_size_cr: 500, fresh_cr: 0, uses: ["ofs_only"], promoter_post: 30,
+    financials: { periods: ["30 Jun 2026", "31 Dec 2025", "31 Dec 2024"], "Total Income": [20, 90, 100], "Profit After Tax": [-4, -8, 2], "NET Worth": [40, 45, 50], "Total Borrowing": [90, 80, 60] } };
+  assert.deepEqual(D.fyCols(ins.financials), [1, 2]);
+  const r = D.research(base, ins);
+  assert.equal(r.longTerm.call, "Cautious");
+  assert.equal(r.valuation.label, "Loss-making");
+});
+
+t("research: relative grades use per-segment quintiles", () => {
+  const mk = (g) => ({ segment: "SME", kpi_fy: { ROE: g, ROCE: g, "PAT Margin": g / 2 }, financials: { periods: ["31 Mar 2026", "31 Mar 2025"], "Total Income": [100 + g, 100], "Profit After Tax": [10 + g / 4, 10], "NET Worth": [50, 45], "Total Borrowing": [10, 10] } });
+  const list = Array.from({ length: 20 }, (_, i) => mk(i * 2));
+  const cuts = D.gradeCuts(list);
+  assert.ok(cuts.SME && !cuts.Mainboard);
+  const grades = list.map((v) => D.research({ segment: "SME" }, v, cuts).grade);
+  assert.ok(new Set(grades).size >= 3 && Math.min(...grades) === 1, "grades " + grades.join(","));
+});
+
 console.log(`\n${passed} tests passed`);
