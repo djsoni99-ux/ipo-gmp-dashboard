@@ -255,5 +255,5 @@
   }
 
   return { DEFAULTS, PRESETS, ledger, run, calibration, csv, addWd, fyOf, pass,
-    stats, distribution, byBucket, byKey, monthly, similar };
+    stats, distribution, byBucket, byKey, monthly, similar, BUCKETS };
 });

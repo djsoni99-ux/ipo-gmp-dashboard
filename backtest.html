@@ -3,7 +3,8 @@
 <head>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width,initial-scale=1">
-<title>IPO GMP Backtest</title>
+<title>IPO Backtest</title>
+<meta name="description" content="Does applying to Indian IPOs pay once allotment odds are counted? Point-in-time test of the Decision Desk calls, rules that paid, what drives listing gains, and how far GMP can be trusted.">
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link href="https://fonts.googleapis.com/css2?family=Source+Serif+4:opsz,wght@8..60,500;8..60,600;8..60,700&family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
@@ -27,347 +28,330 @@
   --shadow:0 1px 2px rgba(0,0,0,.35),0 10px 30px -18px rgba(0,0,0,.7);
 }}
 *{box-sizing:border-box}html,body{margin:0}
-body{background:var(--bg);color:var(--ink);font:15px/1.5 Inter,ui-sans-serif,system-ui,sans-serif;-webkit-font-smoothing:antialiased}
-.num{font-family:Inter,ui-sans-serif,sans-serif;font-variant-numeric:tabular-nums;font-feature-settings:"tnum" 1,"lnum" 1}
+body{background:var(--bg);color:var(--ink);font:15px/1.55 Inter,ui-sans-serif,system-ui,sans-serif;-webkit-font-smoothing:antialiased}
+.num{font-variant-numeric:tabular-nums;font-feature-settings:"tnum" 1,"lnum" 1}
 a{color:var(--accent-ink)}
+button{font:inherit;color:inherit}
 :focus-visible{outline:2px solid var(--accent);outline-offset:2px}
-.wrap{max-width:1180px;margin:0 auto;padding:28px 20px 64px}
+.wrap{max-width:1180px;margin:0 auto;padding:22px 20px 64px}
 .eyebrow{font-size:11.5px;letter-spacing:.16em;text-transform:uppercase;color:var(--accent-ink);font-weight:600}
-h1{font:600 clamp(26px,3.4vw,34px)/1.15 "Source Serif 4",Georgia,serif;margin:4px 0 6px}
-h2{font:600 12px/1.3 Inter,system-ui,sans-serif;margin:0 0 12px;text-transform:uppercase;letter-spacing:.12em;color:var(--accent-ink)}
+h1{font:600 clamp(24px,3.2vw,32px)/1.1 "Source Serif 4",Georgia,serif;margin:2px 0 0}
+h2{font:600 22px/1.25 "Source Serif 4",Georgia,serif;margin:0}
+.q{font-size:11px;letter-spacing:.16em;text-transform:uppercase;color:var(--accent-ink);font-weight:600;margin-bottom:4px}
+.lede{color:var(--ink2);margin:6px 0 0;max-width:78ch}
 .sub{font-size:12.5px;color:var(--ink3)}
-.lede{color:var(--ink2);max-width:75ch;margin:6px 0 0}
-.panel{background:var(--surface);border:1px solid var(--line);border-radius:14px;box-shadow:var(--shadow);padding:16px 18px;margin-bottom:16px}
-.banner{background:var(--warn-soft);color:var(--warn);border:1px solid var(--line);border-radius:12px;padding:10px 14px;font-size:13.5px;margin-bottom:14px}
-.grid{display:grid;gap:12px}
-.tiles{grid-template-columns:repeat(4,1fr)}
-.two{grid-template-columns:1fr 1fr}
-@media(max-width:860px){.tiles{grid-template-columns:repeat(2,1fr)}.two{grid-template-columns:1fr}}
-.tile{background:var(--surface);border:1px solid var(--line);border-radius:14px;padding:13px 15px;box-shadow:var(--shadow);min-width:0}
-.tile .l{font-size:11.5px;color:var(--ink3);text-transform:uppercase;letter-spacing:.06em;font-weight:600}
-.tile .v{font:600 23px/1.25 "Source Serif 4",Georgia,serif}
-.tile .h{font-size:12.5px;color:var(--ink2)}
 .good{color:var(--good)}.bad{color:var(--bad)}
-.tabs{display:inline-flex;background:var(--alt);border:1px solid var(--line);border-radius:12px;padding:4px;gap:4px;margin:16px 0 14px}
-.tabs button{border:0;background:transparent;color:var(--ink2);font:inherit;font-weight:700;font-size:14px;padding:8px 18px;border-radius:9px;cursor:pointer}
-.tabs button.on{background:var(--surface);color:var(--accent-ink);box-shadow:var(--shadow)}
-.tabs button .c{font-weight:500;opacity:.65;margin-left:6px;font-size:12px}
-.seg-card{border-top:3px solid var(--accent)}
-.seg-card.sme{border-top-color:var(--sme)}
-.seg-card h3{margin:0 0 8px;font:600 18px "Source Serif 4",Georgia,serif}
-.kv{display:grid;grid-template-columns:1fr auto;gap:3px 12px;font-size:13px;margin:0}
-.kv dt{color:var(--ink3)}.kv dd{margin:0;text-align:right}
-details>summary{cursor:pointer;font-weight:700;font-family:Inter,sans-serif;text-transform:uppercase;letter-spacing:.05em;font-size:14px}
-.form{display:grid;grid-template-columns:repeat(auto-fill,minmax(150px,1fr));gap:10px 14px;margin-top:12px}
-.form label{display:flex;flex-direction:column;font-size:12px;color:var(--ink3);gap:3px;font-weight:600}
-.form input,.form select{font:inherit;font-size:14px;color:var(--ink);background:var(--bg);border:1px solid var(--line);border-radius:8px;padding:6px 8px;width:100%}
-.form .chk{flex-direction:row;align-items:center;gap:8px;color:var(--ink2)}
-.form .chk input{width:auto}
+.top{display:flex;flex-wrap:wrap;gap:14px;align-items:flex-end;justify-content:space-between;margin-bottom:16px}
+.btn{border:1px solid var(--line);background:var(--surface);border-radius:100px;padding:6px 14px;font-size:12.5px;font-weight:600;cursor:pointer;text-decoration:none;color:var(--ink)}
+.btn:hover{border-color:var(--accent)}
+.tabs{display:inline-flex;background:var(--surface);border:1px solid var(--line);border-radius:12px;padding:4px;gap:4px}
+.tabs button{border:0;background:transparent;color:var(--ink2);font-weight:600;font-size:14px;padding:7px 16px;border-radius:9px;cursor:pointer}
+.tabs button.on{background:var(--hero);color:var(--hero-ink)}
+.tabs .c{font-weight:500;opacity:.65;margin-left:6px;font-size:12px}
+
+.hero{background:var(--hero);color:var(--hero-ink);border-radius:16px;border-top:3px solid var(--accent);padding:24px;margin:16px 0 26px;display:grid;grid-template-columns:1.3fr 1fr;gap:24px}
+@media (max-width:900px){.hero{grid-template-columns:1fr}}
+.hero .k{font-size:11px;letter-spacing:.14em;text-transform:uppercase;color:var(--accent);font-weight:600}
+.hero .headline{font:600 clamp(21px,2.6vw,28px)/1.25 "Source Serif 4",Georgia,serif;margin:8px 0 12px}
+.hero ul{margin:0;padding:0 0 0 18px;color:var(--hero-ink2);font-size:14px;display:flex;flex-direction:column;gap:6px}
+.hero ul b{color:var(--hero-ink);font-weight:600}
+.hero .stats{display:grid;grid-template-columns:1fr 1fr;gap:16px;align-content:start}
+.hero .v{font:600 26px/1.15 "Source Serif 4",Georgia,serif}
+.hero .h{font-size:12.5px;color:var(--hero-ink2)}
+.hero b.pos-h,.pos-h{color:#8FD3B3}.hero b.neg-h,.neg-h{color:#E8A39B}
+
+.sec{margin-bottom:30px}
+.sec-head{margin-bottom:12px}
+.answer{font-size:15px;color:var(--ink);background:var(--accent-soft);border-left:3px solid var(--accent);padding:10px 14px;border-radius:0 10px 10px 0;margin:10px 0 14px}
+.panel{background:var(--surface);border:1px solid var(--line);border-radius:14px;box-shadow:var(--shadow);padding:16px 18px;min-width:0}
+.two{display:grid;grid-template-columns:1fr 1fr;gap:14px}
+.two>*{min-width:0}
+@media (max-width:900px){.two{grid-template-columns:1fr}}
 .scroll{overflow-x:auto}
-.grid>*,.panel{min-width:0}
 table{border-collapse:collapse;width:100%;font-size:13px}
-th{font-size:11px;text-transform:uppercase;letter-spacing:.05em;color:var(--ink3);text-align:right;padding:8px 10px;background:var(--alt);white-space:nowrap}
-td{padding:8px 10px;border-top:1px solid var(--line);text-align:right;white-space:nowrap}
+th{font-size:10.5px;text-transform:uppercase;letter-spacing:.08em;color:var(--ink3);font-weight:600;text-align:right;padding:8px 10px;border-bottom:1px solid var(--line);white-space:nowrap}
+td{padding:9px 10px;border-bottom:1px solid var(--line);text-align:right;white-space:nowrap}
+tr:last-child td{border-bottom:0}
 th:first-child,td:first-child{text-align:left}
-tbody tr.sel{background:var(--accent-soft)}
 tbody tr[data-i]{cursor:pointer}
 tbody tr[data-i]:hover{background:var(--alt)}
-.btn{border:1px solid var(--line);background:var(--surface);color:var(--ink);border-radius:100px;padding:6px 14px;font:inherit;font-size:12.5px;font-weight:600;cursor:pointer}
-svg{width:100%;height:auto;display:block}
-.brow{display:grid;grid-template-columns:96px 1fr 128px;gap:10px;align-items:center;font-size:12.5px;margin:6px 0}
-.bar{height:10px;border-radius:5px;background:var(--alt);position:relative;overflow:hidden}
-.bar i{position:absolute;left:0;top:0;bottom:0;border-radius:5px}
-.bar.mid i{left:50%}
-.bar.mid::after{content:"";position:absolute;left:50%;top:0;bottom:0;width:1px;background:var(--ink3)}
-.thin{opacity:.5}
-.notes li{margin:4px 0;color:var(--ink2);font-size:13px}
+tbody tr.sel{background:var(--accent-soft)}
+.vb{display:inline-block;font-size:11px;font-weight:700;letter-spacing:.03em;padding:3px 10px;border-radius:100px;text-transform:uppercase}
+.v-APPLY{background:var(--good);color:var(--surface)}.v-LOTTERY{background:var(--sme);color:var(--surface)}
+.v-CONSIDER{background:var(--blue);color:var(--surface)}.v-SKIP{background:var(--bad-soft);color:var(--bad)}
+.thin{color:var(--ink3)}
+.brow{display:grid;grid-template-columns:110px 1fr 150px;gap:12px;align-items:center;font-size:13px;padding:6px 0;border-bottom:1px solid var(--line)}
+.brow:last-child{border-bottom:0}
+.bar{height:8px;border-radius:4px;background:var(--alt);position:relative}
+.bar i{position:absolute;top:0;bottom:0;border-radius:4px}
+.bar::after{content:"";position:absolute;left:50%;top:-3px;bottom:-3px;width:1px;background:var(--ink3);opacity:.5}
+.mini{display:grid;grid-template-columns:repeat(4,1fr);gap:10px;margin-top:12px}
+@media (max-width:700px){.mini{grid-template-columns:repeat(2,1fr)}}
+.mini div{border:1px solid var(--line);border-radius:10px;padding:8px 10px}
+.mini .l{font-size:10.5px;text-transform:uppercase;letter-spacing:.08em;color:var(--ink3);font-weight:600}
+.mini .v{font:600 18px "Source Serif 4",Georgia,serif}
+svg{display:block;width:100%;height:auto}
+details.panel>summary{cursor:pointer;font-weight:600;color:var(--accent-ink)}
+.form{display:grid;grid-template-columns:repeat(auto-fill,minmax(160px,1fr));gap:10px 14px;margin-top:12px}
+.form label{display:flex;flex-direction:column;font-size:12px;color:var(--ink3);gap:3px;font-weight:600}
+.form input{font:inherit;font-size:14px;color:var(--ink);background:var(--bg);border:1px solid var(--line);border-radius:8px;padding:6px 8px}
+.form .chk{flex-direction:row;align-items:center;gap:8px;color:var(--ink2)}
+.notes li{margin:5px 0;color:var(--ink2);font-size:13px}
 </style>
 </head>
 <body>
 <div class="wrap">
-  <header>
-    <span class="eyebrow">Applied &rarr; sold on listing day</span>
-    <h1>IPO GMP Backtest</h1>
-    <p class="lede">Each row assumes you applied at the issue price and, if allotted, sold on listing day at the listing price (less slippage and charges). Nothing is held. SME and mainboard are tested separately because they behave very differently.</p>
-    <div class="sub" style="margin-top:6px"><a href="./">&larr; Live dashboard</a> &middot; <span id="coverage">Loading&hellip;</span></div>
+  <header class="top">
+    <div><span class="eyebrow">Backtest &middot; applied, sold on listing day</span><h1>Does applying to IPOs pay?</h1>
+      <p class="lede">Every figure counts the allotment lottery: you are paid only on the shares you actually receive, and the hottest IPOs are the ones you rarely get. Rolling 13 months; SME and mainboard tested separately.</p></div>
+    <div style="display:flex;gap:8px;align-items:center;flex-wrap:wrap"><div class="tabs" id="tabs" role="tablist" aria-label="Segment"></div><a class="btn" href="./">&larr; Decision Desk</a></div>
   </header>
-  <div class="tabs" id="tabs" role="tablist" aria-label="Segment"></div>
-  <div id="banner"></div>
 
-  <section class="grid two" id="scoreboard" style="margin-bottom:16px"></section>
+  <section class="hero" id="hero" aria-label="Verdict"></section>
 
-  <details class="panel">
-    <summary>Assumptions</summary>
+  <section class="sec">
+    <div class="sec-head"><div class="q">Question 1</div><h2>Did the Decision Desk's calls work?</h2></div>
+    <div class="answer" id="valAnswer"></div>
+    <div class="panel"><div class="scroll"><table id="valTable"></table></div><p class="sub" id="valNote" style="margin:10px 0 0"></p></div>
+  </section>
+
+  <section class="sec">
+    <div class="sec-head"><div class="q">Question 2</div><h2>Which rules would have paid?</h2></div>
+    <div class="answer" id="ruleAnswer"></div>
+    <div class="two">
+      <div class="panel"><div class="scroll"><table id="rules"></table></div><p class="sub" style="margin:10px 0 0">Ranked by realistic net profit: after charges and tax, weighted by allotment odds. Click a rule for its track record. * fewer than 15 IPOs.</p></div>
+      <div class="panel" id="ruleDetail"></div>
+    </div>
+  </section>
+
+  <section class="sec">
+    <div class="sec-head"><div class="q">Question 3</div><h2>What actually drives the listing gain?</h2></div>
+    <div class="answer" id="drvAnswer"></div>
+    <div class="two" id="drivers"></div>
+  </section>
+
+  <section class="sec">
+    <div class="sec-head"><div class="q">Question 4</div><h2>How far can GMP be trusted?</h2></div>
+    <div class="answer" id="gmpAnswer"></div>
+    <div class="two">
+      <div class="panel"><div class="scroll"><table id="gmpTable"></table></div></div>
+      <div class="panel"><div class="q" style="margin-bottom:8px">Market regime &middot; average listing gain by month</div><div id="regime"></div></div>
+    </div>
+  </section>
+
+  <details class="panel" style="margin-bottom:14px"><summary>Assumptions &amp; download</summary>
     <div class="form" id="form"></div>
-    <div class="sub" style="margin-top:10px">Everything recalculates instantly in your browser. Rates are defaults as of writing &mdash; verify tax and charges before relying on rupee figures.</div>
+    <p style="margin:14px 0 0"><button class="btn" id="csvBtn" type="button">Download full ledger (CSV)</button></p>
   </details>
-
-  <section class="panel">
-    <h2 id="stratTitle">Strategies</h2>
-    <div class="form" id="custom" style="margin:0 0 12px"></div>
-    <div class="scroll"><table id="cmp"></table></div>
-    <div class="sub" style="margin-top:8px">Click a row for detail. &ldquo;Expected&rdquo; is probability-weighted over the allotment lottery; P10&ndash;P90 is seeded Monte Carlo. &ldquo;GMP at close&rdquo; is point-in-time but exists for fewer IPOs; &ldquo;first GMP&rdquo; is the earliest quote, known before bidding, and exists for nearly all.</div>
-  </section>
-
-  <section id="detail"></section>
-
-  <section class="grid two">
-    <div class="panel"><h2>Listing gain distribution</h2><div id="dist"></div></div>
-    <div class="panel"><h2>Market tape &mdash; average listing gain by month</h2><div id="tape"></div></div>
-  </section>
-
-  <section class="panel">
-    <h2>What actually moved the listing gain</h2>
-    <div class="sub" style="margin-bottom:8px">Descriptive, one factor at a time, for the selected segment. Bars show average listing gain; right column shows n, % listed positive and median.</div>
-    <div class="grid two" id="factors"></div>
-  </section>
-
-  <section class="panel">
-    <h2>How good was GMP as a predictor?</h2>
-    <label class="sub">Signal: <select id="calMode" style="font:inherit;background:var(--bg);color:var(--ink);border:1px solid var(--line);border-radius:8px;padding:4px 6px">
-      <option value="list">Listing-eve GMP (widest coverage, not tradable)</option>
-      <option value="close">Close-day GMP (decision-time, fewer IPOs)</option></select></label>
-    <div id="cal" style="margin-top:10px"></div>
-  </section>
-
-  <section class="panel">
-    <h2>Ledger <span class="sub" id="ledgerNote"></span></h2>
-    <button class="btn" id="csvBtn" type="button">Download CSV</button>
-    <div class="scroll" style="margin-top:10px"><table id="ledger"></table></div>
-  </section>
-
-  <section class="panel notes">
-    <h2>Read this before trusting the numbers</h2>
+  <details class="panel notes"><summary>Method and limits</summary>
     <ul>
-      <li><b>Window:</b> a rolling 13 months of listed IPOs. One market phase may not repeat in another, and per-segment samples are a few hundred at most.</li>
-      <li><b>Point-in-time:</b> &ldquo;GMP at close&rdquo; and &ldquo;first GMP&rdquo; are known before bidding ends. Final subscription is known only as bidding closes (a mild look-ahead if you decide earlier). Listing-eve GMP is shown for calibration only.</li>
-      <li><b>Adverse selection is the main finding:</b> allotment odds use 1/final subscription (total, not retail &mdash; an approximation), capped at 100%. You are most likely to be allotted in the weakest IPOs, and the hottest ones have odds near 1%. So the simple average listing gain flatters; &ldquo;Gain you&rsquo;d get&rdquo; (odds-weighted) and expected net P&amp;L are the honest numbers.</li>
-      <li><b>SME exits are optimistic:</b> circuits, thin order books and market-maker quotes can stop you selling at the listing price; the default slippage is higher for SME but still a guess.</li>
-      <li><b>Survivorship &amp; data:</b> only IPOs that listed are included. GMP is unofficial and noisy. Charges and tax are simplified (no holiday calendar, no loss carry-forward).</li>
+      <li><b>Trade:</b> apply at the upper band; if allotted, sell at the listing price less slippage (mainboard 0.5%, SME 2%), with STT, exchange, GST and DP charges, and STCG of 20.8% netted per financial year. Capital is blocked from the bid day to the refund (T+2) or to sale proceeds (listing + 1).</li>
+      <li><b>Allotment odds:</b> 1 &divide; retail subscription where known, else total. Application counts are not published, so true odds may be somewhat better.</li>
+      <li><b>Decision Desk test:</b> each IPO is scored with only the history that existed before its bid date. GMP is the closing-day GMP where available, otherwise the listing-eve GMP (counted separately; slightly optimistic). Final subscription is known only as bidding closes.</li>
+      <li><b>Samples:</b> per-segment samples are a few hundred IPOs from one market phase, and small groups are marked. This is descriptive analytics, not investment advice.</li>
     </ul>
-  </section>
+  </details>
 </div>
 
 <script src="backtest.js"></script>
+<script src="decide.js"></script>
 <script>
 "use strict";
-const B = window.Backtest;
+const B = window.Backtest, D = window.Decide;
 const $ = (id) => document.getElementById(id);
 const esc = (s) => String(s ?? "").replace(/[&<>"']/g, (c) => ({ "&": "&amp;", "<": "&lt;", ">": "&gt;", '"': "&quot;", "'": "&#39;" }[c]));
 const inr = (n) => n == null || isNaN(n) ? "—" : (n < 0 ? "-" : "") + "₹" + Math.abs(Math.round(n)).toLocaleString("en-IN");
+const lakh = (n) => n == null ? "—" : Math.abs(n) >= 1e5 ? (n < 0 ? "-" : "") + "₹" + (Math.abs(n) / 1e5).toFixed(2) + " L" : inr(n);
 const pc = (n, d = 1) => n == null || isNaN(n) ? "—" : (n > 0 ? "+" : "") + n.toFixed(d) + "%";
-const pr = (x) => x == null ? "—" : (x * 100).toFixed(0) + "%";
+const pr = (x) => x == null ? "—" : Math.round(x * 100) + "%";
 const cls = (n) => n > 0 ? "good" : n < 0 ? "bad" : "";
 const dn = (s) => Date.UTC(+s.slice(0, 4), +s.slice(5, 7) - 1, +s.slice(8, 10)) / 864e5;
+const SEGN = { SME: "SME", Mainboard: "mainboard", All: "both segments" };
 
-const U = { ticketM: 15000, ticketS: 120000, accounts: 1, slipM: 0.5, slipS: 2, brokerage: 20, applyTax: true, tax: 20.8,
-  bench: 6.5, useSub: true, pM: 25, pS: 8, from: "", to: "" };
-const FIELDS = [["ticketM", "Mainboard ticket ₹"], ["ticketS", "SME ticket ₹"], ["accounts", "Accounts (PANs)"],
-  ["slipM", "Mainboard exit slippage %"], ["slipS", "SME exit slippage %"], ["brokerage", "Brokerage ₹/sale"],
-  ["tax", "Tax rate %"], ["bench", "Benchmark %/yr"], ["pM", "P(allot) if sub unknown, Main %"], ["pS", "P(allot) if sub unknown, SME %"],
-  ["from", "From (bid date)", "date"], ["to", "To (bid date)", "date"]];
-const CHECKS = [["useSub", "Allotment odds = 1/final subscription"], ["applyTax", "Apply tax"]];
+const U = { ticketM: 15000, ticketS: 120000, accounts: 1, slipM: 0.5, slipS: 2, brokerage: 20, tax: 20.8, applyTax: true };
 try { Object.assign(U, JSON.parse(localStorage.getItem("ipo-bt-prefs2") || "{}")); } catch (e) {}
+let TAB = "SME", SEL = 0;
+try { const t = localStorage.getItem("ipo-bt-tab"); if (["SME", "Mainboard", "All"].includes(t)) TAB = t; } catch (e) {}
+let ARCH = [], INS = {}, ROWS = [], RECS = new Map(), RULES = [];
 
-const SEG_LABEL = { SME: "SME", Mainboard: "Mainboard (non-SME)", All: "Combined" };
-const PRESETS = {
-  SME: [["Apply to all", {}], ["First GMP > 0", { minFirstGmpPct: 0.01 }], ["First GMP ≥ 10%", { minFirstGmpPct: 10 }], ["First GMP ≥ 20%", { minFirstGmpPct: 20 }],
-    ["GMP at close ≥ 10%", { minGmpPct: 10 }], ["GMP at close ≥ 20%", { minGmpPct: 20 }], ["Final sub ≥ 20x", { minSub: 20 }], ["Final sub ≥ 100x", { minSub: 100 }]],
-  Mainboard: [["Apply to all", {}], ["First GMP > 0", { minFirstGmpPct: 0.01 }], ["First GMP ≥ 10%", { minFirstGmpPct: 10 }], ["First GMP ≥ 20%", { minFirstGmpPct: 20 }],
-    ["GMP at close ≥ 10%", { minGmpPct: 10 }], ["GMP at close ≥ 20%", { minGmpPct: 20 }], ["Final sub ≥ 5x", { minSub: 5 }], ["Issue ≥ ₹500 Cr", { minSize: 500 }]],
-  All: [["Apply to all", {}], ["First GMP ≥ 10%", { minFirstGmpPct: 10 }], ["First GMP ≥ 20%", { minFirstGmpPct: 20 }], ["GMP at close ≥ 10%", { minGmpPct: 10 }], ["Final sub ≥ 10x", { minSub: 10 }]],
-};
-const custom = { minFirstGmpPct: "", minGmpPct: "", minSub: "", minSize: "", minRating: "" };
-
-let RECORDS = [], ROWS = [], TAB = "SME", SEL = 0, RESULTS = [], STRATS = [];
-try { TAB = localStorage.getItem("ipo-bt-tab") || "SME"; } catch (e) {}
-
-const toCfg = () => ({
+const cfg = () => Object.assign({}, B.DEFAULTS, {
   ticket: { Mainboard: +U.ticketM || 15000, SME: +U.ticketS || 120000 }, accounts: Math.max(1, +U.accounts || 1),
-  allot: { Mainboard: (+U.pM || 0) / 100, SME: (+U.pS || 0) / 100 }, useSub: U.useSub, allowPost: false,
-  slippagePct: { Mainboard: +U.slipM || 0, SME: +U.slipS || 0 }, brokerage: +U.brokerage || 0,
-  applyTax: U.applyTax, taxPct: +U.tax || 0, benchmarkPct: +U.bench || 0, mcRuns: 2000, seed: 42,
-});
-const tabRows = () => ROWS.filter((r) => TAB === "All" || r.segment === TAB);
-function strategies() {
-  const range = (s) => Object.assign({ segment: TAB }, s, U.from ? { from: U.from } : {}, U.to ? { to: U.to } : {});
-  const list = PRESETS[TAB].map(([name, f]) => Object.assign({ name }, range(f)));
-  const c = { name: "Custom" };
-  for (const k of Object.keys(custom)) if (custom[k] !== "") c[k] = +custom[k];
-  return list.concat([Object.assign(c, range({}))]);
+  slippagePct: { Mainboard: +U.slipM || 0, SME: +U.slipS || 0 }, brokerage: +U.brokerage || 0, taxPct: +U.tax || 0, applyTax: !!U.applyTax, mcRuns: 2000, seed: 42 });
+const inTab = (seg) => TAB === "All" || seg === TAB;
+const tabRows = () => ROWS.filter((r) => inTab(r.segment) && r.gainPct != null);
+const weighted = (l) => { const w = l.reduce((s, r) => s + r.p, 0); return w ? l.reduce((s, r) => s + r.p * r.gainPct, 0) / w : null; };
+const bar = (v, mx, col) => { const wd = v == null ? 0 : Math.min(50, Math.abs(v) / mx * 50); return `<div class="bar"><i style="${v < 0 ? `right:50%;width:${wd}%;background:var(--bad)` : `left:50%;width:${wd}%;background:${col || "var(--good)"}`}"></i></div>`; };
+
+/* ---------- Q1: point-in-time test of the Decision Desk ---------- */
+function validate() {
+  const c = Object.assign(cfg(), { mcRuns: 0 }), byId = new Map(ROWS.map((r) => [r.id, r])), out = [];
+  for (const v of Object.values(INS)) {
+    const r = byId.get(v.ig_id), rec = RECS.get(v.ig_id);
+    if (!r || r.gainPct == null || !inTab(r.segment)) continue;
+    const g = rec.gmp_close != null ? rec.gmp_close : rec.gmp_list;
+    if (g == null) continue;
+    const p = { name: r.name, segment: r.segment, price: r.price, gmp: g, lot: v.lot, st: "open", close: r.bid, trend: 0, issue_size_cr: v.issue_size_cr, subscription_x: v.sub && v.sub.total };
+    const d = D.decide(p, v, ROWS.filter((x) => x.listing < r.bid), c, r.bid);
+    const odds = v.sub && v.sub.retail ? Math.min(1, 1 / v.sub.retail) : r.p;
+    out.push({ verdict: d.verdict, gain: r.gainPct, odds, real: odds * r.netAllot, src: rec.gmp_close != null ? "close" : "eve" });
+  }
+  return out;
+}
+function agg(l) {
+  const n = l.length; if (!n) return null;
+  const w = l.reduce((s, o) => s + o.odds, 0);
+  return { n, avg: l.reduce((s, o) => s + o.gain, 0) / n, up: l.filter((o) => o.gain > 0).length / n, worst: Math.min(...l.map((o) => o.gain)),
+    get: w ? l.reduce((s, o) => s + o.odds * o.gain, 0) / w : null, real: l.reduce((s, o) => s + o.real, 0) };
+}
+function renderValidation() {
+  const all = validate();
+  const rows = ["APPLY", "LOTTERY", "CONSIDER", "SKIP"].map((v) => [v, agg(all.filter((o) => o.verdict === v))]).filter((x) => x[1]);
+  $("valTable").innerHTML = `<thead><tr><th>Call</th><th>IPOs</th><th>Listed higher</th><th>Avg listing gain</th><th>Gain you'd get</th><th>Worst</th><th>Realistic P&amp;L</th></tr></thead><tbody>`
+    + rows.map(([v, a]) => `<tr><td><span class="vb v-${v}">${D.LABEL[v]}</span></td><td class="num">${a.n}</td><td class="num">${pr(a.up)}</td><td class="num ${cls(a.avg)}">${pc(a.avg)}</td>`
+      + `<td class="num ${cls(a.get)}">${pc(a.get)}</td><td class="num ${cls(a.worst)}">${pc(a.worst, 0)}</td><td class="num ${cls(a.real)}"><b>${inr(a.real)}</b></td></tr>`).join("") + "</tbody>";
+  const go = agg(all.filter((o) => o.verdict === "APPLY" || o.verdict === "LOTTERY")), skip = agg(all.filter((o) => o.verdict === "SKIP"));
+  const closeN = all.filter((o) => o.src === "close").length;
+  $("valAnswer").innerHTML = !all.length ? "Not enough analysed IPOs in this segment yet."
+    : go && skip ? `<b>Yes, the calls separated winners from losers.</b> On ${all.length} recent ${TAB === "All" ? "" : SEGN[TAB] + " "}IPOs scored point-in-time, Apply/Lottery calls listed higher ${pr(go.up)} of the time (avg ${pc(go.avg)}); Skip calls only ${pr(skip.up)} (avg ${pc(skip.avg)}). Applying to the Skips anyway would have ${skip.real < 0 ? "lost" : "made"} about <b>${inr(Math.abs(skip.real))}</b> at realistic odds.`
+      : skip ? `Every recent ${TAB === "All" ? "" : SEGN[TAB] + " "}IPO scored as Skip or Consider. The ${skip.n} Skips listed higher ${pr(skip.up)} of the time, averaging ${pc(skip.avg)}, which supports staying out.`
+        : `${all.length} IPOs tested; see the table.`;
+  $("valNote").textContent = `${all.length} IPOs listed in the last ~35 days with full fundamentals. ${closeN} scored on closing-day GMP and ${all.length - closeN} on listing-eve GMP (slightly optimistic). Each used only history from before its bid date.`;
+  return { go, skip };
 }
 
-function renderStatic() {
-  $("form").innerHTML = FIELDS.map(([k, l, t]) => `<label>${l}<input data-k="${k}" type="${t || "number"}" value="${esc(U[k])}" step="any"></label>`).join("")
-    + CHECKS.map(([k, l]) => `<label class="chk"><input data-c="${k}" type="checkbox" ${U[k] ? "checked" : ""}>${l}</label>`).join("");
-  $("custom").innerHTML = [["minFirstGmpPct", "Min first GMP %"], ["minGmpPct", "Min GMP % at close"], ["minSub", "Min final subscription x"],
-    ["minSize", "Min issue size ₹ Cr"], ["minRating", "Min rating (1-5)"]]
-    .map(([k, l]) => `<label>Custom: ${l}<input data-x="${k}" type="number" step="any" value="${esc(custom[k])}" placeholder="any"></label>`).join("");
+/* ---------- Q2: rules ---------- */
+const PRESETS = {
+  SME: [["Apply to every IPO", {}], ["First GMP > 0", { minFirstGmpPct: 0.01 }], ["First GMP ≥ 10%", { minFirstGmpPct: 10 }], ["First GMP ≥ 20%", { minFirstGmpPct: 20 }],
+    ["Final subscription ≥ 3x", { minSub: 3 }], ["Final subscription ≥ 20x", { minSub: 20 }], ["Final subscription ≥ 100x", { minSub: 100 }]],
+  Mainboard: [["Apply to every IPO", {}], ["First GMP > 0", { minFirstGmpPct: 0.01 }], ["First GMP ≥ 10%", { minFirstGmpPct: 10 }], ["First GMP ≥ 20%", { minFirstGmpPct: 20 }],
+    ["Final subscription ≥ 5x", { minSub: 5 }], ["Final subscription ≥ 20x", { minSub: 20 }], ["Issue ≥ ₹500 Cr", { minSize: 500 }]],
+  All: [["Apply to every IPO", {}], ["First GMP ≥ 10%", { minFirstGmpPct: 10 }], ["First GMP ≥ 20%", { minFirstGmpPct: 20 }], ["Final subscription ≥ 20x", { minSub: 20 }]],
+};
+function renderRules() {
+  const c = cfg();
+  RULES = PRESETS[TAB].map(([name, f]) => B.run(ROWS, Object.assign({ name, segment: TAB }, f), c)).filter((r) => !r.empty).sort((a, b) => b.net - a.net);
+  SEL = Math.min(SEL, RULES.length - 1);
+  $("rules").innerHTML = `<thead><tr><th>Rule</th><th>IPOs</th><th>You'd get</th><th>Down ≥10%</th><th>Net P&amp;L</th></tr></thead><tbody>`
+    + RULES.map((r, i) => `<tr data-i="${i}" class="${i === SEL ? "sel" : ""}"><td>${esc(r.strat.name)}</td><td class="num ${r.n < 15 ? "thin" : ""}">${r.n}${r.n < 15 ? "*" : ""}</td>`
+      + `<td class="num ${cls(r.weightedGainPct)}">${pc(r.weightedGainPct)}</td><td class="num">${pr(r.deepLossRate)}</td><td class="num ${cls(r.net)}"><b>${inr(r.net)}</b></td></tr>`).join("") + "</tbody>";
+  const all = RULES.find((r) => r.strat.name === "Apply to every IPO"), best = RULES.find((r) => r.n >= 15) || RULES[0];
+  $("ruleAnswer").innerHTML = !best ? "Not enough data." : best === all ? `<b>No filter beat simply applying to every ${SEGN[TAB]} IPO</b> (${inr(all.net)} over ${all.n} IPOs).`
+    : `<b>${esc(best.strat.name)}</b> did best: across ${best.n} IPOs the shares you'd have received gained ${pc(best.weightedGainPct)}, netting <b>${inr(best.net)}</b>, against ${inr(all && all.net)} for applying to everything. The edge comes from <b>skipping weak listings</b>, which are exactly the ones you're most likely to be allotted.`;
+  renderRuleDetail();
+}
+function lineChart(pts) {
+  if (pts.length < 2) return '<div class="sub">Not enough data.</div>';
+  const W = 560, H = 170, L = 64, R = 10, T = 10, Bm = 22;
+  const xs = pts.map((p) => dn(p[0])), ys = pts.map((p) => p[1]);
+  const x0 = Math.min(...xs), x1 = Math.max(...xs); let y0 = Math.min(0, ...ys), y1 = Math.max(0, ...ys); if (y1 === y0) y1 = y0 + 1;
+  const X = (x) => L + (x - x0) / Math.max(1, x1 - x0) * (W - L - R), Y = (y) => T + (1 - (y - y0) / (y1 - y0)) * (H - T - Bm);
+  const d = pts.map((p, i) => `${i ? "L" : "M"}${X(dn(p[0])).toFixed(1)} ${Y(p[1]).toFixed(1)}`).join("");
+  const last = ys[ys.length - 1];
+  return `<svg viewBox="0 0 ${W} ${H}" role="img" aria-label="Cumulative net profit">`
+    + [...new Set([y0, 0, y1])].map((t) => `<line x1="${L}" x2="${W - R}" y1="${Y(t).toFixed(1)}" y2="${Y(t).toFixed(1)}" stroke="var(--line)"/><text x="${L - 6}" y="${(Y(t) + 4).toFixed(1)}" text-anchor="end" font-size="10" fill="var(--ink3)">${lakh(t)}</text>`).join("")
+    + `<path d="${d}" fill="none" stroke="${last >= 0 ? "var(--good)" : "var(--bad)"}" stroke-width="2"/>`
+    + `<text x="${L}" y="${H - 5}" font-size="10" fill="var(--ink3)">${pts[0][0]}</text><text x="${W - R}" y="${H - 5}" font-size="10" text-anchor="end" fill="var(--ink3)">${pts[pts.length - 1][0]}</text></svg>`;
+}
+function renderRuleDetail() {
+  const r = RULES[SEL];
+  if (!r) { $("ruleDetail").innerHTML = ""; return; }
+  $("ruleDetail").innerHTML = `<div class="q">Track record</div><h2 style="font-size:19px">${esc(r.strat.name)}</h2>
+    <div class="sub" style="margin:4px 0 8px">Cumulative realistic net profit, by listing date</div>${lineChart(r.equity)}
+    <div class="mini"><div><div class="l">Allotments</div><div class="v">${r.expAllotments.toFixed(1)}</div><div class="sub">expected, of ${r.applications} bids</div></div>
+      <div><div class="l">Cash blocked</div><div class="v">${r.avgBlockedDays.toFixed(1)} d</div><div class="sub">peak ${lakh(r.peakCapital)}</div></div>
+      <div><div class="l">Chance of loss</div><div class="v ${r.mc && r.mc.pLoss > 0.4 ? "bad" : ""}">${r.mc ? pr(r.mc.pLoss) : "—"}</div><div class="sub">over 13 months</div></div>
+      <div><div class="l">Lottery range</div><div class="v" style="font-size:15px">${r.mc ? lakh(r.mc.p10) + " … " + lakh(r.mc.p90) : "—"}</div><div class="sub">P10 … P90</div></div></div>`;
 }
 
-function compute() {
-  const cfg = toCfg();
-  ROWS = B.ledger(RECORDS, cfg);
-  STRATS = strategies();
-  RESULTS = STRATS.map((s) => B.run(ROWS, s, cfg));
-  SEL = Math.min(SEL, RESULTS.length - 1);
-  render(cfg);
+/* ---------- Q3: drivers ---------- */
+function renderDrivers() {
+  const tr = tabRows();
+  const F = [["Final subscription", "sub"], ["GMP before listing", "gmp"], ["Issue size", "size"], ["InvestorGain rating", "rating"]].map(([name, k]) => {
+    const b = B.BUCKETS[k].map(([label, fn]) => { const l = tr.filter((r) => { try { return fn(r) === true; } catch (e) { return false; } }); return Object.assign({ label, get: weighted(l) }, B.stats(l)); });
+    const ok = b.filter((x) => x.n >= 8), hi = ok.reduce((m, x) => !m || x.avgGain > m.avgGain ? x : m, null), lo = ok.reduce((m, x) => !m || x.avgGain < m.avgGain ? x : m, null);
+    return { name, b: b.filter((x) => x.n > 0), hi, lo, spread: hi && lo ? hi.avgGain - lo.avgGain : 0, cover: b.reduce((s, x) => s + x.n, 0) };
+  }).filter((f) => f.cover >= 40 && f.b.length >= 2).sort((a, b) => b.spread - a.spread);
+  const [top, sec] = F;
+  $("drvAnswer").innerHTML = top && top.hi ? `<b>${top.name} separates outcomes most:</b> ${esc(top.hi.label)} averaged ${pc(top.hi.avgGain)} against ${pc(top.lo.avgGain)} for ${esc(top.lo.label)}, a ${top.spread.toFixed(0)}-point spread. ${sec && sec.hi ? `${sec.name} comes next (${sec.spread.toFixed(0)} points).` : ""} The catch: the strongest buckets come with the worst allotment odds, so look at "you'd get".` : "Not enough data.";
+  const mx = Math.max(10, ...F.flatMap((f) => f.b.map((x) => Math.abs(x.avgGain || 0))));
+  $("drivers").innerHTML = F.map((f, i) => `<div class="panel"><div class="q">#${i + 1} · ${f.spread.toFixed(0)}-point spread</div><h2 style="font-size:18px;margin-bottom:8px">${f.name}</h2>`
+    + f.b.map((x) => `<div class="brow ${x.n < 8 ? "thin" : ""}"><span>${esc(x.label)}<br><span class="sub">n=${x.n}${x.n ? " · " + pr(x.posRate) + " up" : ""}</span></span>${bar(x.avgGain, mx)}`
+      + `<span class="num" style="text-align:right">${pc(x.avgGain)}<br><span class="sub">you'd get ${pc(x.get)}</span></span></div>`).join("") + `</div>`).join("");
+}
+
+/* ---------- Q4: GMP trust + regime ---------- */
+function renderGmp() {
+  const tr = tabRows().filter((r) => r.gmpList != null), gp = (r) => r.gmpList / r.price * 100;
+  const b = [["≤ 0%", (g) => g <= 0.0001], ["0–10%", (g) => g > 0.0001 && g < 10], ["10–25%", (g) => g >= 10 && g < 25], ["25–50%", (g) => g >= 25 && g < 50], ["> 50%", (g) => g >= 50]].map(([label, fn]) => {
+    const l = tr.filter((r) => fn(gp(r))), n = l.length;
+    return n ? { label, n, a: l.reduce((s, r) => s + r.gainPct, 0) / n, up: l.filter((r) => r.gainPct > 0).length / n, get: weighted(l), odds: l.reduce((s, r) => s + r.p, 0) / n } : { label, n };
+  });
+  $("gmpTable").innerHTML = `<thead><tr><th>GMP said</th><th>IPOs</th><th>Actual avg</th><th>Listed higher</th><th>Avg odds</th><th>You'd get</th></tr></thead><tbody>`
+    + b.filter((x) => x.n).map((x) => `<tr><td>${x.label}</td><td class="num">${x.n}</td><td class="num ${cls(x.a)}">${pc(x.a)}</td><td class="num">${pr(x.up)}</td><td class="num">1 in ${Math.max(1, Math.round(1 / x.odds))}</td><td class="num ${cls(x.get)}"><b>${pc(x.get)}</b></td></tr>`).join("") + "</tbody>";
+  const cal = B.calibration(tabRows(), "list"), lo = b[0], hi = b.filter((x) => x.n && (x.label === "25–50%" || x.label === "> 50%"));
+  const hiUp = hi.length ? hi.reduce((s, x) => s + x.up * x.n, 0) / hi.reduce((s, x) => s + x.n, 0) : null;
+  $("gmpAnswer").innerHTML = cal.n >= 3 ? `<b>Good for direction, loose on size.</b> GMP correlated ${cal.corr.toFixed(2)} with the listing gain but typically missed by ${cal.mae.toFixed(0)} points. At 25%+ GMP, ${pr(hiUp)} listed higher; at zero or negative GMP, only ${pr(lo.up)} did. Use it to decide <i>whether</i> to apply, not to forecast <i>how much</i>.` : "Not enough data.";
+  const m = B.monthly(tabRows()).slice(-13), mx = Math.max(10, ...m.map((x) => Math.abs(x.avgGain || 0)));
+  $("regime").innerHTML = m.map((x) => `<div class="brow" style="grid-template-columns:70px 1fr 130px"><span>${x.label}</span>${bar(x.avgGain, mx, "var(--accent)")}<span class="num" style="text-align:right">${pc(x.avgGain, 0)} <span class="sub">· ${pr(x.posRate)} up · n=${x.n}</span></span></div>`).join("");
+}
+
+/* ---------- hero ---------- */
+function renderHero(val) {
+  const c = Object.assign(cfg(), { mcRuns: 0 }), run = (s) => B.run(ROWS, { segment: s }, c);
+  const r = run(TAB), cal = B.calibration(tabRows(), "list");
+  const segs = TAB === "All" ? ["SME", "Mainboard"] : [TAB];
+  const line = (s) => { const x = run(s), st = B.stats(ROWS.filter((y) => y.segment === s && y.gainPct != null));
+    return `<li><b>${s}:</b> the average IPO listed ${pc(st.avgGain)}, but the shares you'd actually have received gained <b>${pc(x.weightedGainPct)}</b>; applying to all ${x.n} nets <b class="${x.net >= 0 ? "pos-h" : "neg-h"}">${inr(x.net)}</b>.</li>`; };
+  const who = TAB === "All" ? "" : SEGN[TAB] + " ";
+  const verdict = r.net < 0 ? `Applying to every ${who}IPO <span class="neg-h">lost money</span> once allotment odds are counted.` : `Applying to every ${who}IPO made <span class="pos-h">${inr(r.net)}</span>, a thin return for the cash it ties up.`;
+  const d = tabRows().map((x) => x.listing).sort();
+  $("hero").innerHTML = `<div><div class="k">The verdict · ${TAB === "All" ? "both segments" : TAB} · last 13 months</div><div class="headline">${verdict}</div><ul>${segs.map(line).join("")}
+    ${val.go && val.skip ? `<li>Being selective works: the Desk's <b>Skip</b> calls listed higher only ${pr(val.skip.up)} of the time, its <b>Apply/Lottery</b> calls ${pr(val.go.up)}.</li>` : ""}</ul></div>
+    <div class="stats"><div><div class="k">IPOs tested</div><div class="v num">${r.n}</div><div class="h">${d.length ? d[0] + " → " + d[d.length - 1] : ""}</div></div>
+      <div><div class="k">Average allotment odds</div><div class="v num">1 in ${Math.max(1, Math.round(1 / Math.max(r.allotRate, 1e-9)))}</div><div class="h">hot IPOs far worse</div></div>
+      <div><div class="k">Listed down 10%+</div><div class="v num">${pr(r.deepLossRate)}</div><div class="h">of all listings</div></div>
+      <div><div class="k">GMP typical miss</div><div class="v num">±${cal.mae ? cal.mae.toFixed(0) : "—"} pts</div><div class="h">correlation ${cal.corr ? cal.corr.toFixed(2) : "—"}</div></div></div>`;
 }
 
 function renderTabs() {
-  const n = (s) => ROWS.filter((r) => s === "All" || r.segment === s).length;
-  $("tabs").innerHTML = ["SME", "Mainboard", "All"].map((s) => `<button type="button" role="tab" class="${TAB === s ? "on" : ""}" data-tab="${s}" aria-selected="${TAB === s}">${SEG_LABEL[s]}<span class="c">${n(s)}</span></button>`).join("");
+  const n = (s) => ROWS.filter((r) => (s === "All" || r.segment === s) && r.gainPct != null).length;
+  $("tabs").innerHTML = ["SME", "Mainboard", "All"].map((s) => `<button type="button" role="tab" data-tab="${s}" class="${TAB === s ? "on" : ""}" aria-selected="${TAB === s}">${s === "All" ? "Both" : s}<span class="c">${n(s)}</span></button>`).join("");
 }
-
-function scoreboard(cfg) {
-  const card = (seg) => {
-    const rows = ROWS.filter((r) => r.segment === seg), r = B.run(rows, { segment: seg }, Object.assign({}, cfg, { mcRuns: 0 }));
-    if (r.empty) return `<div class="panel seg-card ${seg === "SME" ? "sme" : ""}"><h3>${SEG_LABEL[seg]}</h3><div class="sub">No IPOs.</div></div>`;
-    const st = B.stats(rows);
-    return `<div class="panel seg-card ${seg === "SME" ? "sme" : ""}"><h3>${SEG_LABEL[seg]} &mdash; apply to all</h3><dl class="kv num">`
-      + `<dt>IPOs</dt><dd>${r.n}</dd><dt>Avg / median listing gain</dt><dd>${pc(st.avgGain)} / ${pc(st.medianGain)}</dd>`
-      + `<dt>Listed positive</dt><dd>${pr(st.posRate)}</dd><dt>Listed ≤ -10%</dt><dd class="bad">${pr(r.deepLossRate)}</dd>`
-      + `<dt>Avg allotment odds</dt><dd>${pr(r.allotRate)}</dd><dt>Gain on shares you'd actually get</dt><dd class="${cls(r.weightedGainPct)}">${pc(r.weightedGainPct)}</dd>`
-      + `<dt>Expected net P&amp;L</dt><dd class="${cls(r.net)}">${inr(r.net)}</dd><dt>Avg days capital blocked</dt><dd>${r.avgBlockedDays.toFixed(1)} d</dd></dl></div>`;
-  };
-  $("scoreboard").innerHTML = card("SME") + card("Mainboard");
+function renderForm() {
+  const F = [["ticketM", "Mainboard ticket ₹"], ["ticketS", "SME ticket ₹"], ["accounts", "Accounts (PANs)"], ["slipM", "Mainboard slippage %"], ["slipS", "SME slippage %"], ["brokerage", "Brokerage ₹/sale"], ["tax", "Tax rate %"]];
+  $("form").innerHTML = F.map(([k, l]) => `<label>${l}<input data-k="${k}" type="number" step="any" value="${esc(U[k])}"></label>`).join("")
+    + `<label class="chk"><input data-c="applyTax" type="checkbox" ${U.applyTax ? "checked" : ""}>Apply tax</label>`;
 }
-
-function render(cfg) {
+function renderAll() {
+  ROWS = B.ledger(ARCH, cfg());
   renderTabs();
-  const tr = tabRows();
-  const withSig = tr.filter((r) => r.sigKind).length;
-  $("banner").innerHTML = tr.length && withSig < tr.length * 0.5
-    ? `<div class="banner">Only ${withSig} of ${tr.length} ${SEG_LABEL[TAB]} IPOs have a decision-time GMP at close (older pages are paywalled). Use the <b>first GMP</b> and <b>final subscription</b> strategies for larger samples; the close-day GMP sample grows by about 40 IPOs a month.</div>` : "";
-  const dates = ROWS.map((r) => r.listing).sort();
-  $("coverage").textContent = `${RECORDS.length} IPOs archived · ${ROWS.length} with listing result · ${ROWS.filter((r) => r.sigKind).length} with close-day GMP`
-    + (dates.length ? ` · ${dates[0]} → ${dates[dates.length - 1]}` : "");
-  scoreboard(cfg);
-  $("stratTitle").textContent = SEG_LABEL[TAB] + " strategies";
-  const head = ["Strategy", "IPOs", "Allot %", "Net P&L", "Avg gain", "Gain you'd get", "Win %", "Loss ≤-10%", "Days blocked", "Peak capital", "Ann. return", "P10 – P90", "P(loss)"];
-  $("cmp").innerHTML = `<thead><tr>${head.map((h) => `<th>${h}</th>`).join("")}</tr></thead><tbody>` + RESULTS.map((r, i) => {
-    const n = esc(r.strat.name);
-    if (r.empty) return `<tr data-i="${i}" class="${i === SEL ? "sel" : ""}"><td>${n}</td><td class="num">0</td><td colspan="12" class="sub" style="text-align:left">no IPOs match</td></tr>`;
-    const thin = r.n < 15 ? ' title="small sample"' : "";
-    return `<tr data-i="${i}" class="${i === SEL ? "sel" : ""} num"><td style="font-family:inherit">${n}</td><td${thin} class="${r.n < 15 ? "thin" : ""}">${r.n}${r.n < 15 ? "*" : ""}</td><td>${pr(r.allotRate)}</td>`
-      + `<td class="${cls(r.net)}">${inr(r.net)}</td><td>${pc(r.avgGainPct)}</td><td class="${cls(r.weightedGainPct)}">${pc(r.weightedGainPct)}</td>`
-      + `<td>${pr(r.winRate)}</td><td>${pr(r.deepLossRate)}</td><td>${r.avgBlockedDays.toFixed(1)} d</td><td>${inr(r.peakCapital)}</td><td class="${cls(r.annReturnPct)}">${pc(r.annReturnPct, 0)}</td>`
-      + `<td>${r.mc ? inr(r.mc.p10) + " – " + inr(r.mc.p90) : "—"}</td><td>${r.mc ? pr(r.mc.pLoss) : "—"}</td></tr>`;
-  }).join("") + "</tbody>";
-  renderDetail(cfg);
-  renderDist();
-  renderFactors();
-  renderCal();
-  renderLedger();
+  const val = renderValidation();
+  renderHero(val); renderRules(); renderDrivers(); renderGmp();
 }
 
-function lineChart(pts, opt = {}) {
-  if (!pts.length) return '<div class="sub">No data</div>';
-  const W = 640, H = 190, L = 62, R = 12, T = 10, Bm = 24;
-  const xs = pts.map((p) => dn(p[0])), ys = pts.map((p) => p[1]);
-  const x0 = Math.min(...xs), x1 = Math.max(...xs);
-  let y0 = Math.min(0, ...ys), y1 = Math.max(0, ...ys);
-  if (y1 === y0) y1 = y0 + 1;
-  const X = (x) => L + (x - x0) / Math.max(1, x1 - x0) * (W - L - R), Y = (y) => T + (1 - (y - y0) / (y1 - y0)) * (H - T - Bm);
-  const d = pts.map((p, i) => `${i ? "L" : "M"}${X(dn(p[0])).toFixed(1)} ${Y(p[1]).toFixed(1)}`).join("");
-  return `<svg viewBox="0 0 ${W} ${H}" role="img" aria-label="${esc(opt.label || "chart")}">`
-    + [y0, (y0 + y1) / 2, y1].map((t) => `<line x1="${L}" x2="${W - R}" y1="${Y(t).toFixed(1)}" y2="${Y(t).toFixed(1)}" stroke="var(--line)"/><text x="${L - 6}" y="${(Y(t) + 4).toFixed(1)}" text-anchor="end" font-size="10" fill="var(--ink3)">${inr(t)}</text>`).join("")
-    + (opt.area ? `<path d="${d}L${X(x1).toFixed(1)} ${Y(0).toFixed(1)}L${X(x0).toFixed(1)} ${Y(0).toFixed(1)}Z" fill="var(--accent-soft)"/>` : "")
-    + `<path d="${d}" fill="none" stroke="var(--accent)" stroke-width="2" stroke-linejoin="round"/>`
-    + `<text x="${L}" y="${H - 6}" font-size="10" fill="var(--ink3)">${pts[0][0]}</text><text x="${W - R}" y="${H - 6}" text-anchor="end" font-size="10" fill="var(--ink3)">${pts[pts.length - 1][0]}</text></svg>`;
-}
-
-function renderDetail(cfg) {
-  const r = RESULTS[SEL];
-  if (!r || r.empty) { $("detail").innerHTML = ""; return; }
-  const t = (l, v, h, c) => `<div class="tile"><div class="l">${l}</div><div class="v num ${c || ""}">${v}</div><div class="h">${h}</div></div>`;
-  const excess = r.net - r.benchmarkPnl;
-  $("detail").innerHTML = `<h2 style="margin:18px 0 10px">${esc(SEG_LABEL[TAB])} &middot; ${esc(r.strat.name)}</h2><div class="grid tiles" style="margin-bottom:12px">`
-    + t("Net P&L (expected)", inr(r.net), `gross ${inr(r.gross)} · charges ${inr(r.charges)} · tax ${inr(r.tax)}`, cls(r.net))
-    + t("Applications", r.applications, `${r.expAllotments.toFixed(1)} expected allotments (${pr(r.allotRate)})`)
-    + t("Avg days blocked", r.avgBlockedDays.toFixed(1) + " d", `refunded ${r.avgDaysRefund.toFixed(0)} d · allotted ${r.avgDaysAllot.toFixed(0)} d`)
-    + t("Peak capital", inr(r.peakCapital), `avg ${inr(r.avgCapital)} · locked ${pr(r.utilisation)} of days`)
-    + t("Return on blocked capital", pc(r.annReturnPct, 0) + " p.a.", `benchmark ${cfg.benchmarkPct}% · excess ${inr(excess)}`, cls(excess))
-    + t("Gain you'd actually get", pc(r.weightedGainPct), `simple avg ${pc(r.avgGainPct)} · median ${pc(r.medianGainPct)} · best ${pc(r.bestGainPct, 0)} · worst ${pc(r.worstGainPct, 0)}`, cls(r.weightedGainPct))
-    + t("Win rate (per allotment)", pr(r.winRate), `listed ≤ -10%: ${pr(r.deepLossRate)} · ≥ +25%: ${pr(r.bigWinRate)}`)
-    + t("Lottery spread", r.mc ? inr(r.mc.p10) + " … " + inr(r.mc.p90) : "—", r.mc ? `median ${inr(r.mc.p50)} · P(loss) ${pr(r.mc.pLoss)} · max drawdown ${inr(r.maxDrawdown)}` : "")
-    + `</div><div class="grid two"><div class="panel"><h2>Cumulative expected net P&amp;L</h2>${lineChart(r.equity, { label: "equity curve" })}</div>`
-    + `<div class="panel"><h2>Capital blocked (expected)</h2>${lineChart(r.blocked, { area: true, label: "capital blocked" })}</div></div>`;
-}
-
-function barRows(items, opt = {}) {
-  const mx = Math.max(10, ...items.map((b) => Math.abs(b.avgGain || 0)));
-  return items.map((b) => {
-    const v = b.avgGain, w = v == null ? 0 : Math.min(50, Math.abs(v) / mx * 50);
-    const fill = v == null ? "" : v < 0 ? `right:50%;left:auto;width:${w}%;background:var(--bad)` : `left:50%;width:${w}%;background:var(--good)`;
-    return `<div class="brow ${b.n < 5 ? "thin" : ""}"><span>${esc(b.label)}<br><span class="sub">n=${b.n}</span></span>`
-      + `<div class="bar mid"><i style="${fill}"></i></div>`
-      + `<span class="num" style="text-align:right">${b.n ? pc(b.avgGain, 0) + `<br><span class="sub">${pr(b.posRate)} up · med ${pc(b.medianGain, 0)}</span>` : "—"}</span></div>`;
-  }).join("") || '<div class="sub">No data</div>';
-}
-
-function renderDist() {
-  const tr = tabRows(), d = B.distribution(tr), mx = Math.max(1, ...d.map((x) => x.n));
-  $("dist").innerHTML = d.map((x) => `<div class="brow"><span>${x.label}</span><div class="bar"><i style="width:${x.n / mx * 100}%;background:${x.hi <= 0 ? "var(--bad)" : "var(--accent)"}"></i></div>`
-    + `<span class="num" style="text-align:right">${x.n} <span class="sub">${pr(x.share)}</span></span></div>`).join("");
-  $("tape").innerHTML = barRows(B.monthly(tr));
-}
-
-function renderFactors() {
-  const tr = tabRows();
-  const sect = B.byKey(tr, "sector", 3).slice(0, 8);
-  const panel = (title, items) => `<div><h2 style="font-size:12px;color:var(--ink3)">${title}</h2>${barRows(items)}</div>`;
-  $("factors").innerHTML = panel("Listing-eve GMP", B.byBucket(tr, "gmp")) + panel("Final subscription", B.byBucket(tr, "sub"))
-    + panel("Issue size", B.byBucket(tr, "size")) + panel("InvestorGain rating", B.byBucket(tr, "rating"))
-    + `<div style="grid-column:1/-1">${panel("Sector (3+ IPOs)", sect)}</div>`;
-}
-
-function renderCal() {
-  const c = B.calibration(tabRows(), $("calMode").value);
-  if (!c.n || c.n < 3) { $("cal").innerHTML = '<div class="sub">Not enough IPOs with this signal yet.</div>'; return; }
-  const mx = Math.max(10, ...c.buckets.flatMap((b) => [Math.abs(b.avgGmp || 0), Math.abs(b.avgGain || 0)]));
-  const bar = (v, color) => `<div class="bar"><i style="width:${Math.min(100, Math.abs(v || 0) / mx * 100)}%;background:${v < 0 ? "var(--bad)" : color}"></i></div>`;
-  $("cal").innerHTML = `<div class="sub" style="margin-bottom:8px">n = ${c.n} · correlation ${c.corr == null ? "—" : c.corr.toFixed(2)} · bias ${pc(c.bias)} pts (GMP minus actual) · typical miss ${c.mae.toFixed(1)} pts</div>`
-    + c.buckets.map((b) => `<div class="brow"><span>${b.label}<br><span class="sub">n=${b.n}</span></span><div>${bar(b.avgGmp, "var(--ink3)")}${bar(b.avgGain, "var(--accent)")}</div>`
-      + `<span class="num sub" style="text-align:right">${b.n ? pc(b.avgGmp, 0) + " → " + pc(b.avgGain, 0) : ""}<br>${b.n ? pr(b.posRate) + " up" : ""}</span></div>`).join("")
-    + `<div class="sub" style="margin-top:6px">Grey bar = average GMP, brown bar = average actual listing gain, per GMP bucket.</div>`;
-}
-
-function renderLedger() {
-  const s = STRATS[SEL] || {};
-  const rows = ROWS.filter((r) => B.pass(r, s)).slice().reverse();
-  $("ledgerNote").textContent = `(${rows.length} IPOs in the selected strategy, newest first; showing 150)`;
-  $("ledger").innerHTML = "<thead><tr>" + ["IPO", "Seg", "Sector", "Bid", "Price", "First GMP", "GMP @close", "Final sub", "P(allot)", "Listing gain", "Net / allotment", "Days"].map((h) => `<th>${h}</th>`).join("") + "</tr></thead><tbody>"
-    + rows.slice(0, 150).map((r) => `<tr class="num"><td style="font-family:inherit">${esc(r.name)}</td><td>${r.segment === "SME" ? "SME" : "Main"}</td><td style="font-family:inherit">${esc(r.sector || "—")}</td><td>${r.bid}</td><td>${inr(r.price)}</td>`
-      + `<td>${r.gmpFirstPct == null ? "—" : pc(r.gmpFirstPct)}</td><td>${r.sigKind ? pc(r.gmpPct) : "—"}</td><td>${r.subClose == null ? "—" : r.subClose + "x"}</td><td>${pr(r.p)}${r.pKnown ? "" : "*"}</td>`
-      + `<td class="${cls(r.gainPct)}">${pc(r.gainPct)}</td><td class="${cls(r.netAllot)}">${inr(r.netAllot)}</td><td>${r.dRefund}/${r.dAllot}</td></tr>`).join("") + "</tbody>";
-}
-
+document.addEventListener("click", (e) => {
+  const t = e.target.closest("[data-tab]");
+  if (t) { TAB = t.dataset.tab; SEL = 0; try { localStorage.setItem("ipo-bt-tab", TAB); } catch (err) {} renderAll(); return; }
+  const r = e.target.closest("tr[data-i]");
+  if (r) { SEL = +r.dataset.i; document.querySelectorAll("#rules tr.sel").forEach((x) => x.classList.remove("sel")); r.classList.add("sel"); renderRuleDetail(); }
+});
 document.addEventListener("input", (e) => {
   const el = e.target;
-  if (el.dataset.k) U[el.dataset.k] = el.value;
-  else if (el.dataset.c) U[el.dataset.c] = el.checked;
-  else if (el.dataset.x) custom[el.dataset.x] = el.value;
-  else return;
+  if (el.dataset.k) U[el.dataset.k] = el.value; else if (el.dataset.c) U[el.dataset.c] = el.checked; else return;
   try { localStorage.setItem("ipo-bt-prefs2", JSON.stringify(U)); } catch (err) {}
-  compute();
+  renderAll();
 });
-document.addEventListener("click", (e) => {
-  const tab = e.target.closest("[data-tab]");
-  if (tab) { TAB = tab.dataset.tab; SEL = 0; try { localStorage.setItem("ipo-bt-tab", TAB); } catch (err) {} compute(); return; }
-  const tr = e.target.closest("tr[data-i]");
-  if (tr) { SEL = +tr.dataset.i; render(toCfg()); }
-});
-$("calMode").addEventListener("change", renderCal);
 $("csvBtn").addEventListener("click", () => {
-  const blob = new Blob([B.csv(ROWS.filter((r) => B.pass(r, STRATS[SEL] || {})))], { type: "text/csv" });
-  const a = document.createElement("a"); a.href = URL.createObjectURL(blob); a.download = "ipo-backtest-ledger.csv"; a.click();
+  const blob = new Blob([B.csv(tabRows())], { type: "text/csv" });
+  const a = document.createElement("a"); a.href = URL.createObjectURL(blob); a.download = "ipo-backtest-" + TAB.toLowerCase() + ".csv"; a.click();
   setTimeout(() => URL.revokeObjectURL(a.href), 2000);
 });
 
-renderStatic();
-fetch("archive.json?t=" + Date.now(), { cache: "no-store" }).then((r) => r.json()).then((d) => { RECORDS = d.records || []; compute(); })
-  .catch((e) => { $("coverage").textContent = "Could not load archive.json (" + e + ")"; });
+renderForm();
+const bust = "?t=" + Math.floor(Date.now() / 6e5);
+Promise.all([fetch("archive.json" + bust).then((r) => r.json()), fetch("insights.json" + bust).then((r) => r.json()).catch(() => ({ ipos: {} }))])
+  .then(([a, i]) => { ARCH = a.records || []; RECS = new Map(ARCH.map((r) => [r.id, r])); INS = i.ipos || {}; renderAll(); })
+  .catch((e) => { $("hero").innerHTML = `<div>Could not load data (${esc(String(e))}).</div>`; });
 </script>
 </body>
 </html>
