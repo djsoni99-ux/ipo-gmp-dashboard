@@ -1,0 +1,51 @@
+name: Update backtest archive
+
+on:
+  schedule:
+    - cron: "0 16 * * *"        # daily 21:30 IST, after the market day
+  workflow_dispatch:
+    inputs:
+      lo:
+        description: "Backfill from InvestorGain id (leave empty for incremental)"
+        required: false
+      hi:
+        description: "Backfill to InvestorGain id"
+        required: false
+
+permissions:
+  contents: write
+
+concurrency:
+  group: archive-ipo
+  cancel-in-progress: false
+
+jobs:
+  archive:
+    runs-on: ubuntu-latest
+    timeout-minutes: 60
+    steps:
+      - uses: actions/checkout@v5
+
+      - name: Engine tests
+        run: node test_backtest.js
+
+      - name: Update archive
+        run: |
+          if [ -n "${{ inputs.lo }}" ] && [ -n "${{ inputs.hi }}" ]; then
+            python3 build_archive.py --range "${{ inputs.lo }}" "${{ inputs.hi }}" --workers 4
+          else
+            python3 build_archive.py
+          fi
+
+      - name: Commit if the archive changed
+        run: |
+          git config user.name  "ipo-gmp-bot"
+          git config user.email "ipo-gmp-bot@users.noreply.github.com"
+          git add archive.json
+          if git diff --cached --quiet; then
+            echo "nothing changed"
+          else
+            git commit -m "data: archive update $(TZ=Asia/Kolkata date +'%d %b %H:%M') IST"
+            git pull --rebase --autostash
+            git push
+          fi

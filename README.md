@@ -30,6 +30,27 @@ source never blanks the board. Source health is shown top-right and in `ipo.json
 These are the sites' own unofficial JSON/HTML endpoints, so they can change without notice.
 Fetches are low-volume (one request per source per run) and identify as `ipo-gmp-dashboard`.
 
+## Backtest (`backtest.html`)
+
+"What if I had applied to every IPO, or only those passing a GMP rule?" Everything is computed in the browser
+from `archive.json` by `backtest.js` (pure functions, tested by `node test_backtest.js`).
+
+```
+build_archive.py   InvestorGain per-IPO pages -> archive.json   (daily 21:30 IST via archive.yml, resumable backfill)
+backtest.js        ledger -> expected value + seeded Monte Carlo -> metrics, capital blocked, calibration
+backtest.html      assumptions panel, strategy comparison, charts, ledger, CSV export
+```
+
+Model: ticket per application (shares = floor(ticket/price)); bid on closing day; refunded at T+2, or sold at listing
+and released T+1 after listing; allotment probability = 1/subscription where known, else your assumption; exit at
+listing price less slippage; STT/exchange/GST/DP charges; STCG netted per financial year; capital blocked timeline.
+
+Window: a **rolling 13 months** (older IPOs are pruned on each daily run; `KEEP_MONTHS` in `build_archive.py`).
+
+Limits: old InvestorGain pages are paywalled to the last 3 GMP readings, so they have the listing result but no
+close-day GMP. GMP filters only use close-day GMP (point-in-time); the sample of those grows ~40 IPOs/month.
+Backfill from Actions: run **Update backtest archive** with `lo`/`hi` ids.
+
 ## Run locally
 
 ```bash
