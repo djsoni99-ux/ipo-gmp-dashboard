@@ -7,38 +7,38 @@
 <meta name="description" content="Apply / skip calls for Indian mainboard and SME IPOs: GMP, realistic allotment odds, valuation vs precedents, and how GMP compared with actual listings over the last 30 days.">
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-<link href="https://fonts.googleapis.com/css2?family=Archivo:wght@600;700;800;900&family=Public+Sans:wght@400;500;600;700&family=IBM+Plex+Mono:wght@500;600&display=swap" rel="stylesheet">
+<link href="https://fonts.googleapis.com/css2?family=Source+Serif+4:opsz,wght@8..60,500;8..60,600;8..60,700&family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
 <style>
 :root{
-  --bg:#F5F2EA;--surface:#fff;--alt:#EFEBE1;--line:#E0DACB;
-  --ink:#1F1B14;--ink2:#58513F;--ink3:#8A836D;
-  --accent:#B5651D;--accent-ink:#7A4212;--accent-soft:#F1E1CB;
-  --good:#18794E;--good-soft:#D8F1E3;--bad:#B3261E;--bad-soft:#F8DEDC;
-  --warn:#9A5B00;--warn-soft:#FBEDD3;--blue:#1D4ED8;--blue-soft:#DCE6FD;--sme:#6B4FA0;--sme-soft:#EAE3F6;
-  --hero:#1F1B14;--hero-ink:#F5F2EA;--hero-ink2:#C9C1AC;
-  --shadow:0 1px 2px rgba(31,27,20,.06),0 8px 24px -14px rgba(31,27,20,.3);
+  --bg:#F7F5F0;--surface:#FFFFFF;--alt:#F2EFE8;--line:#E5E1D6;
+  --ink:#0E1A2B;--ink2:#465062;--ink3:#8B919B;
+  --accent:#A8844F;--accent-ink:#7A5E34;--accent-soft:#F3EDE1;
+  --good:#1D6B52;--good-soft:#E4F0EA;--bad:#9A2F2F;--bad-soft:#F5E6E4;
+  --warn:#8C6A1E;--warn-soft:#F6EFDD;--blue:#1F3A5F;--blue-soft:#E6ECF3;--sme:#5B5283;--sme-soft:#ECEAF3;
+  --hero:#0E1A2B;--hero-ink:#F7F4EC;--hero-ink2:#AEB6C2;
+  --shadow:0 1px 2px rgba(14,26,43,.04),0 10px 30px -18px rgba(14,26,43,.22);
 }
 @media (prefers-color-scheme:dark){:root{
-  --bg:#15130E;--surface:#1E1B14;--alt:#26221A;--line:#383220;
-  --ink:#F3EFE4;--ink2:#C7C0AC;--ink3:#9A9279;
-  --accent:#E0913E;--accent-ink:#F6C387;--accent-soft:#3A2A15;
-  --good:#4ADE80;--good-soft:#163422;--bad:#F2857D;--bad-soft:#3A1E1B;
-  --warn:#E3B34A;--warn-soft:#3A2C10;--blue:#8DB0FF;--blue-soft:#1B2740;--sme:#B7A0F0;--sme-soft:#2A2340;
-  --hero:#26221A;--hero-ink:#F3EFE4;--hero-ink2:#B5AD97;
-  --shadow:0 1px 2px rgba(0,0,0,.3),0 8px 24px -14px rgba(0,0,0,.6);
+  --bg:#0A111D;--surface:#101A2A;--alt:#152237;--line:#223149;
+  --ink:#EEF1F5;--ink2:#B4BDCA;--ink3:#7D889C;
+  --accent:#C9A66B;--accent-ink:#DCC08E;--accent-soft:#2A2618;
+  --good:#5CBF95;--good-soft:#11291F;--bad:#E08B86;--bad-soft:#331A1A;
+  --warn:#D9B45E;--warn-soft:#2E2512;--blue:#8EB1E6;--blue-soft:#14233B;--sme:#B2A8DE;--sme-soft:#221F35;
+  --hero:#152237;--hero-ink:#F2EEE4;--hero-ink2:#A3ADBB;
+  --shadow:0 1px 2px rgba(0,0,0,.35),0 10px 30px -18px rgba(0,0,0,.7);
 }}
 *{box-sizing:border-box}
 html,body{margin:0}
-body{background:var(--bg);color:var(--ink);font:15px/1.5 "Public Sans",ui-sans-serif,system-ui,-apple-system,sans-serif;-webkit-font-smoothing:antialiased}
-.num{font-family:"IBM Plex Mono",ui-monospace,Menlo,monospace;font-variant-numeric:tabular-nums}
+body{background:var(--bg);color:var(--ink);font:15px/1.5 Inter,ui-sans-serif,system-ui,-apple-system,sans-serif;-webkit-font-smoothing:antialiased}
+.num{font-family:Inter,ui-sans-serif,sans-serif;font-variant-numeric:tabular-nums;font-feature-settings:"tnum" 1,"lnum" 1}
 a{color:var(--accent-ink)}
 button{font:inherit;color:inherit}
 :focus-visible{outline:2px solid var(--accent);outline-offset:2px}
 .wrap{max-width:1220px;margin:0 auto;padding:22px 20px 64px}
-h1{font:900 clamp(24px,3.2vw,32px)/1.1 Archivo,system-ui,sans-serif;letter-spacing:-.01em;margin:2px 0 0}
-h2{font:800 19px/1.25 Archivo,system-ui,sans-serif;margin:0}
-h3{font:800 13px/1.3 Archivo,sans-serif;text-transform:uppercase;letter-spacing:.06em;color:var(--ink3);margin:0 0 8px}
-.eyebrow{font-size:12px;letter-spacing:.09em;text-transform:uppercase;color:var(--accent-ink);font-weight:700}
+h1{font:600 clamp(24px,3.2vw,32px)/1.1 "Source Serif 4",Georgia,serif;letter-spacing:-.01em;margin:2px 0 0}
+h2{font:600 19px/1.25 "Source Serif 4",Georgia,serif;margin:0}
+h3{font:600 11.5px/1.3 Inter,sans-serif;text-transform:uppercase;letter-spacing:.12em;color:var(--accent-ink);margin:0 0 10px}
+.eyebrow{font-size:11.5px;letter-spacing:.16em;text-transform:uppercase;color:var(--accent-ink);font-weight:600}
 .sub{font-size:12.5px;color:var(--ink3)}
 .muted{color:var(--ink3)}
 .good{color:var(--good)}.bad{color:var(--bad)}
@@ -58,20 +58,20 @@ h3{font:800 13px/1.3 Archivo,sans-serif;text-transform:uppercase;letter-spacing:
 .banner{background:var(--warn-soft);color:var(--warn);border-radius:12px;padding:10px 14px;font-size:13.5px;margin-bottom:12px}
 
 /* hero: today's call */
-.hero{background:var(--hero);color:var(--hero-ink);border-radius:18px;padding:22px 24px;margin-bottom:16px;display:grid;grid-template-columns:1.25fr 1fr;gap:22px}
+.hero{background:var(--hero);color:var(--hero-ink);border-radius:16px;border-top:3px solid var(--accent);padding:22px 24px;margin-bottom:16px;display:grid;grid-template-columns:1.25fr 1fr;gap:22px}
 @media (max-width:900px){.hero{grid-template-columns:1fr}}
-.hero .k{font-size:11.5px;letter-spacing:.09em;text-transform:uppercase;color:var(--hero-ink2);font-weight:700}
-.hero .headline{font:900 clamp(22px,2.8vw,30px)/1.2 Archivo,sans-serif;margin:6px 0 10px}
+.hero .k{font-size:11px;letter-spacing:.14em;text-transform:uppercase;color:var(--accent);font-weight:600}
+.hero .headline{font:600 clamp(22px,2.8vw,30px)/1.2 "Source Serif 4",Georgia,serif;margin:6px 0 10px}
 .hero .lines{display:flex;flex-direction:column;gap:7px}
 .hero .line{display:flex;gap:10px;align-items:baseline;flex-wrap:wrap;font-size:14px}
 .hero .line b{font-weight:700}
 .hero .stats{display:grid;grid-template-columns:1fr 1fr;gap:14px;align-content:start}
-.hero .stat .v{font:800 24px/1.15 Archivo,sans-serif}
+.hero .stat .v{font:600 24px/1.15 "Source Serif 4",Georgia,serif}
 .hero .stat .h{font-size:12.5px;color:var(--hero-ink2)}
 .vb{display:inline-block;font-size:11.5px;font-weight:800;letter-spacing:.03em;padding:3px 10px;border-radius:100px;white-space:nowrap;text-transform:uppercase}
-.v-APPLY{background:var(--good);color:#fff}
-.v-LOTTERY{background:var(--sme);color:#fff}
-.v-CONSIDER{background:var(--blue);color:#fff}
+.v-APPLY{background:var(--good);color:var(--surface)}
+.v-LOTTERY{background:var(--sme);color:var(--surface)}
+.v-CONSIDER{background:var(--blue);color:var(--surface)}
 .v-SKIP{background:var(--bad-soft);color:var(--bad)}
 .v-WAIT,.v-CLOSED{background:var(--alt);color:var(--ink2)}
 
@@ -87,28 +87,28 @@ h3{font:800 13px/1.3 Archivo,sans-serif;text-transform:uppercase;letter-spacing:
 /* decision cards */
 .cards{display:grid;grid-template-columns:repeat(auto-fill,minmax(min(370px,100%),1fr));gap:14px}
 .cards>*,.panel,.two>*{min-width:0}
-.card{background:var(--surface);border:1px solid var(--line);border-radius:16px;box-shadow:var(--shadow);padding:16px;display:flex;flex-direction:column;gap:12px;position:relative;overflow:hidden}
-.card::before{content:"";position:absolute;left:0;top:0;bottom:0;width:5px;background:var(--line)}
+.card{background:var(--surface);border:1px solid var(--line);border-radius:14px;box-shadow:var(--shadow);padding:16px;display:flex;flex-direction:column;gap:12px;position:relative;overflow:hidden}
+.card::before{content:"";position:absolute;left:0;top:0;bottom:0;width:3px;background:var(--line)}
 .card.APPLY::before{background:var(--good)}.card.LOTTERY::before{background:var(--sme)}.card.CONSIDER::before{background:var(--blue)}.card.SKIP::before{background:var(--bad)}
 .c-top{display:grid;grid-template-columns:1fr auto;gap:10px;align-items:start}
-.c-name{font:800 18px/1.2 Archivo,sans-serif;overflow-wrap:anywhere}
+.c-name{font:600 18px/1.2 "Source Serif 4",Georgia,serif;overflow-wrap:anywhere}
 .c-meta{display:flex;flex-wrap:wrap;gap:6px 10px;align-items:center;margin-top:6px;font-size:12.5px;color:var(--ink2)}
 .tag{font-size:11px;font-weight:700;padding:2px 8px;border-radius:100px;white-space:nowrap}
 .t-main{background:var(--accent-soft);color:var(--accent-ink)}.t-sme{background:var(--sme-soft);color:var(--sme)}
 .when{font-weight:700;color:var(--blue)}.when.hot{color:var(--bad)}
 .ring{width:62px;height:62px;position:relative}
-.ring span{position:absolute;inset:0;display:grid;place-items:center;font:800 18px Archivo,sans-serif}
-.ring small{display:block;font:600 9.5px "Public Sans";color:var(--ink3);text-align:center;margin-top:-2px}
+.ring span{position:absolute;inset:0;display:grid;place-items:center;font:600 18px "Source Serif 4",Georgia,serif}
+.ring small{display:block;font:600 9.5px Inter;color:var(--ink3);text-align:center;margin-top:-2px}
 .kpis{display:grid;grid-template-columns:repeat(2,1fr);gap:8px}
-.kpi{background:var(--alt);border-radius:10px;padding:8px 9px;min-width:0}
+.kpi{background:var(--bg);border:1px solid var(--line);border-radius:10px;padding:8px 9px;min-width:0}
 .kpi .l{font-size:10.5px;text-transform:uppercase;letter-spacing:.05em;color:var(--ink3);font-weight:700}
-.kpi .v{font:700 16px/1.25 "IBM Plex Mono",monospace;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.kpi .v{font:700 16px/1.25 Inter,sans-serif;font-feature-settings:"tnum" 1;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
 .kpi .h{font-size:11px;color:var(--ink2);white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
 .scen{display:grid;grid-template-columns:repeat(3,1fr);gap:0;border:1px solid var(--line);border-radius:10px;overflow:hidden}
 .scen div{padding:7px 9px;border-right:1px solid var(--line)}
 .scen div:last-child{border-right:0}
 .scen .l{font-size:10.5px;text-transform:uppercase;letter-spacing:.05em;color:var(--ink3);font-weight:700}
-.scen .v{font:700 14px "IBM Plex Mono",monospace}
+.scen .v{font:700 14px Inter,sans-serif;font-feature-settings:"tnum" 1}
 .scen .h{font-size:11px;color:var(--ink2)}
 .why{list-style:none;margin:0;padding:0;display:flex;flex-direction:column;gap:5px;font-size:13px}
 .why li{display:grid;grid-template-columns:18px 1fr;gap:6px;align-items:start}
@@ -133,9 +133,9 @@ details.more summary{cursor:pointer;font-size:12.5px;font-weight:700;color:var(-
 @media (max-width:900px){.two{grid-template-columns:1fr}}
 .tiles{display:grid;grid-template-columns:repeat(4,1fr);gap:10px;margin-bottom:12px}
 @media (max-width:900px){.tiles{grid-template-columns:repeat(2,1fr)}}
-.tile{background:var(--alt);border-radius:12px;padding:10px 12px;min-width:0}
+.tile{background:var(--bg);border:1px solid var(--line);border-radius:12px;padding:10px 12px;min-width:0}
 .tile .l{font-size:11px;color:var(--ink3);text-transform:uppercase;letter-spacing:.05em;font-weight:700}
-.tile .v{font:800 21px/1.2 Archivo,sans-serif}
+.tile .v{font:600 21px/1.2 "Source Serif 4",Georgia,serif}
 .tile .h{font-size:12px;color:var(--ink2)}
 .scroll{overflow-x:auto}
 table.t{border-collapse:collapse;width:100%;font-size:12.5px}
@@ -323,7 +323,7 @@ function renderHero(t) {
   const live = S.ipos.filter((p) => inSeg(p.segment) && (p.st === "open" || p.st === "upcoming"));
   const g = (v) => live.filter((p) => p.call.verdict === v);
   const apply = g("APPLY"), lot = g("LOTTERY"), cons = g("CONSIDER"), skip = g("SKIP"), wait = g("WAIT");
-  const names = (l) => l.map((p) => `${esc(p.name)}${p.st === "open" && p.close === t ? " <span style=\"color:#F2857D\">(closes today)</span>" : p.st === "upcoming" ? " (opens " + dd(p.open) + ")" : ""}`).join(", ");
+  const names = (l) => l.map((p) => `${esc(p.name)}${p.st === "open" && p.close === t ? " <span style=\"color:#E8A39B\">(closes today)</span>" : p.st === "upcoming" ? " (opens " + dd(p.open) + ")" : ""}`).join(", ");
   const go = apply.concat(lot);
   const cash = go.reduce((s, p) => s + (p.call.invested || 0), 0) * cfg().accounts;
   const ev = go.reduce((s, p) => s + (p.call.ev || 0), 0) * cfg().accounts;
@@ -339,7 +339,7 @@ function renderHero(t) {
     ${line("CONSIDER", cons, names(cons))}${line("SKIP", skip, names(skip))}${line("WAIT", wait, names(wait))}</div></div>
     <div class="stats">
       <div class="stat"><div class="k">Cash to bid on the calls</div><div class="v num">${lakh(cash)}</div><div class="h">${go.length} application${go.length === 1 ? "" : "s"} × ${cfg().accounts} account(s), blocked ~4 days</div></div>
-      <div class="stat"><div class="k">Expected profit (odds-weighted)</div><div class="v num" style="color:${ev >= 0 ? "#6EE7A1" : "#F2857D"}">${inr(ev)}</div><div class="h">after charges, before tax</div></div>
+      <div class="stat"><div class="k">Expected profit (odds-weighted)</div><div class="v num" style="color:${ev >= 0 ? "#8FD3B3" : "#F2857D"}">${inr(ev)}</div><div class="h">after charges, before tax</div></div>
       <div class="stat"><div class="k">Closing today</div><div class="v">${closing}</div><div class="h">UPI mandates must be approved by 5 PM</div></div>
       <div class="stat"><div class="k">GMP accuracy, last 30 days</div><div class="v num" id="heroAcc">—</div><div class="h" id="heroAccH"></div></div>
     </div>`;
