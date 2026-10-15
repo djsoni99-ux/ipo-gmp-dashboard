@@ -51,6 +51,25 @@ Limits: old InvestorGain pages are paywalled to the last 3 GMP readings, so they
 close-day GMP. GMP filters only use close-day GMP (point-in-time); the sample of those grows ~40 IPOs/month.
 Backfill from Actions: run **Update backtest archive** with `lo`/`hi` ids.
 
+## Decision desk (index.html)
+
+Every live IPO gets a call - **Apply**, **Apply · lottery odds**, **Consider**, **Skip** - with a 0-100 score, confidence,
+realistic allotment odds (1 / retail subscription), expected rupees per application, bear/base/bull per lot and the
+reasons behind it. The method adapts the *analyzing IPO valuation and pricing* skill (CaseMark) to a retail applicant
+who sells on listing day: comps -> precedent same-sector IPOs from Chittorgarh, IPO discount -> post-issue P/E vs those
+precedents, demand -> QIB / NII / retail subscription, stress test -> bear/base/bull from how similar IPOs actually listed.
+
+```
+insights.py   Chittorgarh detail + subscription pages -> insights.json (financials, KPIs, P/E, precedents, category
+              subscription, fresh/OFS, promoter holding); active IPOs refreshed every 30 min, last 35 days cached
+decide.js     verdict engine (weights: GMP 30, history 20, demand 20, valuation 15, fundamentals 10, structure 5);
+              tested by `node test_decide.js`
+```
+
+The **last 30 days** panel shows, for every listing, the GMP path, GMP at close and on listing eve, the actual
+listing gain, the miss, retail subscription, allotment odds, and the realistic (odds-weighted) return versus the
+"allotted every time" number most GMP sites imply.
+
 ## What the dashboard adds beyond a GMP table
 
 - **Decision cards** for open / upcoming IPOs: GMP, subscription meter with allotment odds (~1 in N), expected value

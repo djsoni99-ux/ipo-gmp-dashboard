@@ -27,7 +27,7 @@ jobs:
       - uses: actions/checkout@v5
 
       - name: Engine tests
-        run: node test_backtest.js
+        run: node test_backtest.js && node test_decide.js
 
       - name: Update archive
         run: |
