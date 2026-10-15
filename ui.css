@@ -2,10 +2,10 @@
    Swiss-minimal structure, private-bank palette. Hairlines over boxes, one accent, tabular figures. */
 
 :root{
-  --bg:#F6F4EF; --surface:#FFFFFF; --surface-2:#FBFAF7; --line:#E8E3D9; --line-2:#D9D2C3;
-  --ink:#0E1A2B; --ink-2:#4A5466; --ink-3:#868C96;
+  --bg:#F2F4F7; --surface:#FFFFFF; --surface-2:#F7F8FA; --line:#E1E5EB; --line-2:#CBD2DB;
+  --ink:#0E1A2B; --ink-2:#465062; --ink-3:#626A77;
   --brand:#0E1A2B; --on-brand:#F7F4EC;
-  --gold:#A8844F; --gold-ink:#7A5E34; --gold-soft:#F4EEE2;
+  --gold:#A8844F; --gold-ink:#7A5E34; --gold-soft:#F5F0E6;
   --good:#1D6B52; --good-soft:#E6F1EB; --bad:#9A2F2F; --bad-soft:#F6E7E5;
   --info:#1F3A5F; --info-soft:#E8EDF4; --plum:#5B5283; --plum-soft:#EEECF4; --warn:#8C6A1E;
   --elev:0 24px 64px -28px rgba(14,26,43,.45);
