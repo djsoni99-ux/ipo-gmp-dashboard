@@ -3,210 +3,148 @@
 <head>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width,initial-scale=1">
-<title>IPO Decision Desk</title>
-<meta name="description" content="Apply / skip calls for Indian mainboard and SME IPOs: GMP, realistic allotment odds, valuation vs precedents, and how GMP compared with actual listings over the last 30 days.">
+<title>IPO Desk · Today</title>
+<meta name="description" content="Apply or skip calls for Indian mainboard and SME IPOs, with realistic allotment odds, valuation against precedents, and a 30-day track record of GMP against actual listings.">
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-<link href="https://fonts.googleapis.com/css2?family=Source+Serif+4:opsz,wght@8..60,500;8..60,600;8..60,700&family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+<link href="https://fonts.googleapis.com/css2?family=Source+Serif+4:opsz,wght@8..60,400;8..60,500;8..60,600&family=Inter:wght@400;500;600&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="ui.css">
 <style>
-:root{
-  --bg:#F7F5F0;--surface:#FFFFFF;--alt:#F2EFE8;--line:#E5E1D6;
-  --ink:#0E1A2B;--ink2:#465062;--ink3:#8B919B;
-  --accent:#A8844F;--accent-ink:#7A5E34;--accent-soft:#F3EDE1;
-  --good:#1D6B52;--good-soft:#E4F0EA;--bad:#9A2F2F;--bad-soft:#F5E6E4;
-  --warn:#8C6A1E;--warn-soft:#F6EFDD;--blue:#1F3A5F;--blue-soft:#E6ECF3;--sme:#5B5283;--sme-soft:#ECEAF3;
-  --hero:#0E1A2B;--hero-ink:#F7F4EC;--hero-ink2:#AEB6C2;
-  --shadow:0 1px 2px rgba(14,26,43,.04),0 10px 30px -18px rgba(14,26,43,.22);
+/* page-specific: ranked call list */
+.row,.row-h{display:grid;grid-template-columns:150px minmax(0,1fr) 112px 104px 124px 110px 20px;gap:20px;align-items:center}
+.row-h{padding:10px 0;font-size:12px;font-weight:500;color:var(--ink-3);border-bottom:1px solid var(--line)}
+.row-h span:nth-child(n+3){text-align:right}
+.row{padding:18px 6px 18px 0;border:0;border-bottom:1px solid var(--line);cursor:pointer;transition:background .15s var(--ease);width:100%;background:none;text-align:left}
+.row:hover{background:var(--surface-2)}
+.row .v{text-align:right}
+.row .v b{display:block;font-weight:600;font-size:15px}
+.row .v small{display:block;color:var(--ink-3);font-size:12px;margin-top:2px}
+.row .name{font:500 18px/1.25 var(--serif);letter-spacing:-.005em}
+.row .meta{display:flex;flex-wrap:wrap;gap:6px 12px;align-items:center;margin-top:5px;font-size:12.5px;color:var(--ink-2)}
+.row .meta .hot{color:var(--bad);font-weight:600}
+.row .score{font-size:12px;color:var(--ink-3);margin-top:6px}
+.row .chev{color:var(--ink-3)}
+.row.dim .name,.row.dim .v b{color:var(--ink-2)}
+@media (max-width:900px){
+  .row-h{display:none}
+  .row{grid-template-columns:1fr 1fr;gap:10px 16px;padding:16px 0}
+  .row>:nth-child(1),.row>:nth-child(2){grid-column:1/-1}
+  .row .v{text-align:left}
+  .row .chev{display:none}
 }
-@media (prefers-color-scheme:dark){:root{
-  --bg:#0A111D;--surface:#101A2A;--alt:#152237;--line:#223149;
-  --ink:#EEF1F5;--ink2:#B4BDCA;--ink3:#7D889C;
-  --accent:#C9A66B;--accent-ink:#DCC08E;--accent-soft:#2A2618;
-  --good:#5CBF95;--good-soft:#11291F;--bad:#E08B86;--bad-soft:#331A1A;
-  --warn:#D9B45E;--warn-soft:#2E2512;--blue:#8EB1E6;--blue-soft:#14233B;--sme:#B2A8DE;--sme-soft:#221F35;
-  --hero:#152237;--hero-ink:#F2EEE4;--hero-ink2:#A3ADBB;
-  --shadow:0 1px 2px rgba(0,0,0,.35),0 10px 30px -18px rgba(0,0,0,.7);
-}}
-*{box-sizing:border-box}
-html,body{margin:0}
-body{background:var(--bg);color:var(--ink);font:15px/1.5 Inter,ui-sans-serif,system-ui,-apple-system,sans-serif;-webkit-font-smoothing:antialiased}
-.num{font-family:Inter,ui-sans-serif,sans-serif;font-variant-numeric:tabular-nums;font-feature-settings:"tnum" 1,"lnum" 1}
-a{color:var(--accent-ink)}
-button{font:inherit;color:inherit}
-:focus-visible{outline:2px solid var(--accent);outline-offset:2px}
-.wrap{max-width:1220px;margin:0 auto;padding:22px 20px 64px}
-h1{font:600 clamp(24px,3.2vw,32px)/1.1 "Source Serif 4",Georgia,serif;letter-spacing:-.01em;margin:2px 0 0}
-h2{font:600 19px/1.25 "Source Serif 4",Georgia,serif;margin:0}
-h3{font:600 11.5px/1.3 Inter,sans-serif;text-transform:uppercase;letter-spacing:.12em;color:var(--accent-ink);margin:0 0 10px}
-.eyebrow{font-size:11.5px;letter-spacing:.16em;text-transform:uppercase;color:var(--accent-ink);font-weight:600}
-.sub{font-size:12.5px;color:var(--ink3)}
-.muted{color:var(--ink3)}
-.good{color:var(--good)}.bad{color:var(--bad)}
+.group-label{font-size:12px;font-weight:500;color:var(--ink-3);padding:26px 0 6px}
+.dmeta{display:flex;flex-wrap:wrap;gap:6px 12px;margin-top:8px;font-size:12.5px;color:var(--ink-2)}
 
-.top{display:flex;flex-wrap:wrap;gap:14px;align-items:flex-end;justify-content:space-between;margin-bottom:16px}
-.pills{display:flex;flex-wrap:wrap;gap:8px;justify-content:flex-end;align-items:center}
-.pill-live{display:inline-flex;align-items:center;gap:7px;background:var(--surface);border:1px solid var(--line);border-radius:100px;padding:6px 12px;font-size:12.5px;color:var(--ink2)}
-.dot{width:8px;height:8px;border-radius:50%;background:var(--ink3)}
-.dot.on{background:var(--good);animation:pulse 2.4s ease-in-out infinite}.dot.warn{background:var(--warn)}
-@keyframes pulse{50%{opacity:.35}}
-@media (prefers-reduced-motion:reduce){.dot.on{animation:none}}
-.btn{border:1px solid var(--line);background:var(--surface);border-radius:100px;padding:6px 14px;font-size:12.5px;font-weight:600;cursor:pointer;text-decoration:none;color:var(--ink)}
-.btn:hover{border-color:var(--accent)}
-.btn[aria-busy=true]{opacity:.6;pointer-events:none}
-.src{font-size:12px;color:var(--ink3);text-align:right;margin-top:4px}
-.src .bad{font-weight:600}
-.banner{background:var(--warn-soft);color:var(--warn);border-radius:12px;padding:10px 14px;font-size:13.5px;margin-bottom:12px}
+/* drawer content */
+.d-figs{display:grid;grid-template-columns:1fr 1fr;border:1px solid var(--line);border-radius:var(--r);margin:18px 0}
+.d-figs>div{padding:14px 16px}
+.d-figs>div:nth-child(odd){border-right:1px solid var(--line)}
+.d-figs>div:nth-child(n+3){border-top:1px solid var(--line)}
+.d-figs .l{font-size:12px;color:var(--ink-3)}
+.d-figs .v{font:500 22px/1.2 var(--serif);margin-top:2px}
+.d-figs .h{font-size:12px;color:var(--ink-2)}
+.d-sec{margin-top:26px}
+.d-sec h4{font-size:12px;font-weight:600;color:var(--ink-3);margin:0 0 10px;letter-spacing:.06em;text-transform:uppercase}
+.rec{font:400 17px/1.55 var(--serif);color:var(--ink);margin:4px 0 0}
+.range{position:relative;height:40px;margin:4px 8px 0}
+.range .track{position:absolute;left:0;right:0;top:19px;height:2px;background:var(--line)}
+.range .span{position:absolute;top:18px;height:4px;border-radius:2px;background:var(--gold)}
+.range .zero{position:absolute;top:10px;width:1px;height:22px;background:var(--ink-3)}
+.range .pt{position:absolute;top:12px;width:16px;height:16px;margin-left:-8px;border-radius:50%;background:var(--surface);border:2px solid var(--ink)}
+.range .pt.base{background:var(--ink)}
+.range-l{display:grid;grid-template-columns:repeat(3,1fr);font-size:12.5px;margin-top:4px;color:var(--ink-3)}
+.range-l div:nth-child(2){text-align:center}.range-l div:nth-child(3){text-align:right}
+.range-l b{display:block;font-size:15px;color:var(--ink)}
+.range-l b.pos{color:var(--good)}.range-l b.neg{color:var(--bad)}
+.why{list-style:none;padding:0;margin:0;display:grid;gap:10px;font-size:14px}
+.why li{display:grid;grid-template-columns:20px 1fr;gap:8px}
+.why .p{color:var(--good)}.why .m{color:var(--bad)}
+.fac{display:grid;grid-template-columns:120px 1fr 34px;gap:4px 12px;align-items:center;font-size:13px;padding:9px 0;border-bottom:1px solid var(--line)}
+.fac:last-child{border-bottom:0}
+.fac .note{grid-column:2/-1;color:var(--ink-3);font-size:12px}
+.fac .w{color:var(--ink-3);font-size:12px;text-align:right}
+.d-actions{display:flex;gap:10px;flex-wrap:wrap;margin-top:28px;padding-top:18px;border-top:1px solid var(--line)}
 
-/* hero: today's call */
-.hero{background:var(--hero);color:var(--hero-ink);border-radius:16px;border-top:3px solid var(--accent);padding:22px 24px;margin-bottom:16px;display:grid;grid-template-columns:1.25fr 1fr;gap:22px}
-@media (max-width:900px){.hero{grid-template-columns:1fr}}
-.hero .k{font-size:11px;letter-spacing:.14em;text-transform:uppercase;color:var(--accent);font-weight:600}
-.hero .headline{font:600 clamp(22px,2.8vw,30px)/1.2 "Source Serif 4",Georgia,serif;margin:6px 0 10px}
-.hero .lines{display:flex;flex-direction:column;gap:7px}
-.hero .line{display:flex;gap:10px;align-items:baseline;flex-wrap:wrap;font-size:14px}
-.hero .line b{font-weight:700}
-.hero .stats{display:grid;grid-template-columns:1fr 1fr;gap:14px;align-content:start}
-.hero .stat .v{font:600 24px/1.15 "Source Serif 4",Georgia,serif}
-.hero .stat .h{font-size:12.5px;color:var(--hero-ink2)}
-.vb{display:inline-block;font-size:11.5px;font-weight:800;letter-spacing:.03em;padding:3px 10px;border-radius:100px;white-space:nowrap;text-transform:uppercase}
-.v-APPLY{background:var(--good);color:var(--surface)}
-.v-LOTTERY{background:var(--sme);color:var(--surface)}
-.v-CONSIDER{background:var(--blue);color:var(--surface)}
-.v-SKIP{background:var(--bad-soft);color:var(--bad)}
-.v-WAIT,.v-CLOSED{background:var(--alt);color:var(--ink2)}
-
-.tabs{display:inline-flex;background:var(--alt);border:1px solid var(--line);border-radius:12px;padding:4px;gap:4px;margin-bottom:16px}
-.tabs button{border:0;background:transparent;color:var(--ink2);font-weight:700;font-size:14px;padding:7px 16px;border-radius:9px;cursor:pointer}
-.tabs button.on{background:var(--surface);color:var(--accent-ink);box-shadow:var(--shadow)}
-.tabs .c{font-weight:500;opacity:.65;margin-left:6px;font-size:12px}
-
-.sec{margin-bottom:28px}
-.sec-h{display:flex;flex-wrap:wrap;align-items:baseline;gap:6px 12px;margin:0 0 12px}
-.sec-h .sub{margin-left:auto}
-
-/* decision cards */
-.cards{display:grid;grid-template-columns:repeat(auto-fill,minmax(min(370px,100%),1fr));gap:14px}
-.cards>*,.panel,.two>*{min-width:0}
-.card{background:var(--surface);border:1px solid var(--line);border-radius:14px;box-shadow:var(--shadow);padding:16px;display:flex;flex-direction:column;gap:12px;position:relative;overflow:hidden}
-.card::before{content:"";position:absolute;left:0;top:0;bottom:0;width:3px;background:var(--line)}
-.card.APPLY::before{background:var(--good)}.card.LOTTERY::before{background:var(--sme)}.card.CONSIDER::before{background:var(--blue)}.card.SKIP::before{background:var(--bad)}
-.c-top{display:grid;grid-template-columns:1fr auto;gap:10px;align-items:start}
-.c-name{font:600 18px/1.2 "Source Serif 4",Georgia,serif;overflow-wrap:anywhere}
-.c-meta{display:flex;flex-wrap:wrap;gap:6px 10px;align-items:center;margin-top:6px;font-size:12.5px;color:var(--ink2)}
-.tag{font-size:11px;font-weight:700;padding:2px 8px;border-radius:100px;white-space:nowrap}
-.t-main{background:var(--accent-soft);color:var(--accent-ink)}.t-sme{background:var(--sme-soft);color:var(--sme)}
-.when{font-weight:700;color:var(--blue)}.when.hot{color:var(--bad)}
-.ring{width:62px;height:62px;position:relative}
-.ring span{position:absolute;inset:0;display:grid;place-items:center;font:600 18px "Source Serif 4",Georgia,serif}
-.ring small{display:block;font:600 9.5px Inter;color:var(--ink3);text-align:center;margin-top:-2px}
-.kpis{display:grid;grid-template-columns:repeat(2,1fr);gap:8px}
-.kpi{background:var(--bg);border:1px solid var(--line);border-radius:10px;padding:8px 9px;min-width:0}
-.kpi .l{font-size:10.5px;text-transform:uppercase;letter-spacing:.05em;color:var(--ink3);font-weight:700}
-.kpi .v{font:700 16px/1.25 Inter,sans-serif;font-feature-settings:"tnum" 1;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
-.kpi .h{font-size:11px;color:var(--ink2);white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
-.scen{display:grid;grid-template-columns:repeat(3,1fr);gap:0;border:1px solid var(--line);border-radius:10px;overflow:hidden}
-.scen div{padding:7px 9px;border-right:1px solid var(--line)}
-.scen div:last-child{border-right:0}
-.scen .l{font-size:10.5px;text-transform:uppercase;letter-spacing:.05em;color:var(--ink3);font-weight:700}
-.scen .v{font:700 14px Inter,sans-serif;font-feature-settings:"tnum" 1}
-.scen .h{font-size:11px;color:var(--ink2)}
-.why{list-style:none;margin:0;padding:0;display:flex;flex-direction:column;gap:5px;font-size:13px}
-.why li{display:grid;grid-template-columns:18px 1fr;gap:6px;align-items:start}
-.why .i{font-weight:800;text-align:center;border-radius:5px;font-size:12px;line-height:18px}
-.why .p{background:var(--good-soft);color:var(--good)}.why .m{background:var(--bad-soft);color:var(--bad)}
-details.more summary{cursor:pointer;font-size:12.5px;font-weight:700;color:var(--accent-ink)}
-.fbar{display:grid;grid-template-columns:96px 1fr;gap:4px 10px;align-items:center;font-size:12px;margin:6px 0}
-.fbar .bar{height:7px;border-radius:4px;background:var(--alt);overflow:hidden}
-.fbar .bar i{display:block;height:100%;border-radius:4px}
-.fbar .note{grid-column:2;color:var(--ink2);font-size:11.5px;margin-top:-2px}
-.mt{border-collapse:collapse;width:100%;font-size:12px;margin-top:6px}
-.mt th,.mt td{padding:4px 6px;border-top:1px solid var(--line);text-align:right;white-space:nowrap}
-.mt th{color:var(--ink3);font-weight:600;font-size:10.5px;text-transform:uppercase;background:none;border-top:0}
-.mt th:first-child,.mt td:first-child{text-align:left;white-space:normal}
-.c-foot{display:flex;align-items:center;justify-content:space-between;gap:8px;font-size:12.5px;margin-top:auto}
-.plan{display:inline-flex;gap:6px;align-items:center;cursor:pointer;font-weight:600}
-.empty{padding:26px;text-align:center;color:var(--ink3);background:var(--surface);border:1px dashed var(--line);border-radius:14px}
-
-/* panels */
-.panel{background:var(--surface);border:1px solid var(--line);border-radius:16px;box-shadow:var(--shadow);padding:16px}
-.two{display:grid;grid-template-columns:1fr 1fr;gap:14px}
-@media (max-width:900px){.two{grid-template-columns:1fr}}
-.tiles{display:grid;grid-template-columns:repeat(4,1fr);gap:10px;margin-bottom:12px}
-@media (max-width:900px){.tiles{grid-template-columns:repeat(2,1fr)}}
-.tile{background:var(--bg);border:1px solid var(--line);border-radius:12px;padding:10px 12px;min-width:0}
-.tile .l{font-size:11px;color:var(--ink3);text-transform:uppercase;letter-spacing:.05em;font-weight:700}
-.tile .v{font:600 21px/1.2 "Source Serif 4",Georgia,serif}
-.tile .h{font-size:12px;color:var(--ink2)}
-.scroll{overflow-x:auto}
-table.t{border-collapse:collapse;width:100%;font-size:12.5px}
-table.t th{font-size:10.5px;text-transform:uppercase;letter-spacing:.05em;color:var(--ink3);text-align:right;padding:8px;background:var(--alt);white-space:nowrap}
-table.t td{padding:7px 8px;border-top:1px solid var(--line);text-align:right;white-space:nowrap;vertical-align:middle}
-table.t th:first-child,table.t td:first-child{text-align:left}
-.chg{font-size:12px;font-weight:700;padding:1px 7px;border-radius:6px}
-.pos{background:var(--good-soft);color:var(--good)}.neg{background:var(--bad-soft);color:var(--bad)}.zero{background:var(--alt);color:var(--ink3)}
-svg{display:block}
-.sources{margin-top:22px;font-size:12.5px;color:var(--ink2)}
-.sources .fine{color:var(--ink3)}
+/* record section */
+.compare{display:grid;gap:18px}
+.compare .seg-row{display:grid;grid-template-columns:1.1fr 1fr 1fr;gap:16px;align-items:end;padding-bottom:16px;border-bottom:1px solid var(--line)}
+.compare .l{font-size:12px;color:var(--ink-3)}
+.compare .v{font:500 26px/1.15 var(--serif)}
+.compare .sname{font:500 16px var(--serif)}
+details.more>summary{list-style:none;cursor:pointer;display:inline-flex}
+details.more>summary::-webkit-details-marker{display:none}
+details.more[open]>summary .lbl-open{display:none}
+details.more:not([open])>summary .lbl-close{display:none}
+.spark{display:block}
+.empty{padding:40px 0;text-align:center;color:var(--ink-3)}
+.banner{border:1px solid var(--line);border-left:2px solid var(--warn);background:var(--surface);padding:10px 14px;border-radius:var(--r-sm);font-size:13.5px;color:var(--ink-2);margin-bottom:18px}
 </style>
 </head>
 <body>
-<div class="wrap">
-  <header class="top">
-    <div><span class="eyebrow">Indian IPOs &middot; apply or skip</span><h1>IPO Decision Desk</h1></div>
-    <div>
-      <div class="pills">
-        <span class="pill-live"><span class="dot" id="liveDot"></span><span id="liveTxt">Loading&hellip;</span></span>
-        <button class="btn" id="refreshBtn" type="button">Refresh</button>
-        <a class="btn" href="backtest.html">Backtest &rarr;</a>
-      </div>
-      <div class="src" id="srcLine"></div>
-    </div>
-  </header>
+<header class="appbar"><div class="in">
+  <a class="brand" href="./" aria-label="IPO Desk home"><span class="mark" aria-hidden="true">IP</span><b>IPO Desk</b></a>
+  <nav class="nav" aria-label="Sections">
+    <a href="#today" data-nav="today" class="on">Today</a>
+    <a href="#calls" data-nav="calls">Live calls</a>
+    <a href="#record" data-nav="record">Track record</a>
+    <a href="backtest.html">Backtest</a>
+  </nav>
+  <div class="bar-end">
+    <div class="status" title="Data freshness"><span class="dot" id="liveDot"></span><span class="t" id="liveTxt">Loading</span></div>
+    <button class="plan-pill" id="planBtn" type="button" aria-label="Open my plan"><svg class="i" viewBox="0 0 24 24"><rect x="3" y="4" width="18" height="17" rx="2"/><path d="M8 2v4M16 2v4M3 10h18"/></svg>Plan <b id="planN">0</b></button>
+    <button class="icon-btn" id="refreshBtn" type="button" aria-label="Refresh data"><svg class="i" viewBox="0 0 24 24"><path d="M21 12a9 9 0 1 1-2.6-6.4"/><path d="M21 4v5h-5"/></svg></button>
+  </div>
+</div></header>
+
+<main class="page">
   <div id="banner"></div>
 
-  <section class="hero" id="hero" aria-label="Today's call"></section>
-
-  <div class="tabs" id="seg" role="tablist" aria-label="Segment"></div>
-
-  <section class="sec">
-    <div class="sec-h"><h2>Calls on live IPOs</h2><span class="sub">ranked: Apply → Lottery → Consider → Skip</span></div>
-    <div class="cards" id="calls"></div>
+  <section id="today" aria-labelledby="headline">
+    <div class="eyebrow" id="dateline">&nbsp;</div>
+    <h1 class="display" id="headline">Reading today's book&hellip;</h1>
+    <p class="lede" id="lede"></p>
+    <div class="figures" id="figures"></div>
   </section>
 
-  <section class="sec" id="awaitSec">
-    <div class="sec-h"><h2>Bidding closed, listing soon</h2><span class="sub">what GMP now implies for allottees</span></div>
-    <div class="cards" id="await"></div>
-  </section>
-
-  <section class="sec">
-    <div class="sec-h"><h2>Last 30 days: what GMP said vs what you'd actually have got</h2><span class="sub" id="realSub"></span></div>
-    <div class="panel">
-      <div class="tiles" id="realTiles"></div>
-      <div class="two" style="margin-bottom:12px">
-        <div><h3>GMP before listing vs actual listing gain</h3><div id="scatter"></div></div>
-        <div><h3>If you had applied to every one</h3><div id="realApply"></div></div>
-      </div>
-      <h3>Every listing, with its GMP path</h3>
-      <div class="scroll"><table class="t" id="real"></table></div>
+  <section class="section" id="calls" aria-labelledby="callsH">
+    <div class="section-head">
+      <div><div class="kicker">Live calls</div><h2 class="sec" id="callsH">Ranked from apply to skip</h2>
+        <p>Each IPO is scored on six factors: GMP, how similar IPOs actually listed, institutional demand, valuation against recent sector IPOs, fundamentals and offer structure. Open one for the full analysis.</p></div>
+      <div class="seg" id="seg" role="group" aria-label="Segment"></div>
     </div>
+    <div class="row-h" aria-hidden="true"><span>Call</span><span>IPO</span><span>GMP</span><span>Allotment odds</span><span>Expected / bid</span><span>Base case</span><span></span></div>
+    <div id="list"></div>
   </section>
 
-  <section class="sec two">
-    <div class="panel"><div class="sec-h"><h2>Capital planner</h2><span class="sub">tick &ldquo;Add to plan&rdquo;</span></div><div id="planner"></div></div>
-    <div class="panel"><div class="sec-h"><h2>How the score works</h2></div>
-      <div class="sub" style="font-size:13px;color:var(--ink2)">
-        <p style="margin-top:0">Each live IPO gets a 0&ndash;100 score from six factors, adapted from the IPO valuation &amp; pricing method (comps, precedent IPOs, IPO discount, demand, bear/base/bull):</p>
-        <p><b>GMP signal 30</b> &middot; <b>History 20</b> (how similar IPOs actually listed) &middot; <b>Demand 20</b> (QIB, NII, retail &mdash; institutions first) &middot; <b>Valuation 15</b> (post-issue P/E vs recent same-sector IPOs) &middot; <b>Fundamentals 10</b> (growth, margin, ROE, leverage) &middot; <b>Structure 5</b> (fresh issue vs offer-for-sale).</p>
-        <p><b>Apply</b> = score &ge; 62 and base-case listing gain &ge; 8%. <b>Lottery</b> = same, but allotment odds below 1 in 10, so the expected rupees are small. <b>Consider</b> = 45&ndash;61. <b>Skip</b> = weak score, base case &le; 3%, or fewer than 45% of similar IPOs listed higher. SME calls are downgraded when the bear case is worse than &minus;10%.</p>
-        <p style="margin-bottom:0">Base case blends today's GMP with what similar IPOs actually did; bear and bull use the worst and best 10% of those outcomes. Odds use retail subscription (1 &divide; times subscribed). Descriptive analytics, not investment advice.</p>
-      </div>
+  <section class="section" id="record" aria-labelledby="recordH">
+    <div class="section-head">
+      <div><div class="kicker">Track record · last 30 days</div><h2 class="sec" id="recordH">What GMP promised, and what you'd actually have made</h2></div>
+      <span class="muted" id="recordN" style="font-size:13px"></span>
     </div>
+    <p class="answer" id="recordAnswer"></p>
+    <div class="grid-2">
+      <div class="surface pad"><h3 class="sub">GMP the evening before listing, against the actual listing gain</h3><p class="note" style="margin:4px 0 14px">Points below the dashed line listed worse than GMP suggested.</p><div id="scatter"></div></div>
+      <div class="surface pad"><h3 class="sub">If you had applied to every listing</h3><p class="note" style="margin:4px 0 18px">One application each, sold at the listing price, after charges.</p><div class="compare" id="compare"></div></div>
+    </div>
+    <details class="more" style="margin-top:22px">
+      <summary class="btn"><span class="lbl-open" id="allLbl">Show every listing</span><span class="lbl-close">Hide listings</span></summary>
+      <div class="scroll-x" style="margin-top:14px"><table class="tbl" id="real"></table></div>
+    </details>
   </section>
 
-  <div class="sources">
-    <p><b>Sources:</b> <a href="https://www.investorgain.com/report/ipo-gmp-live/331/" target="_blank" rel="noopener">InvestorGain</a> (GMP, history) &middot; <a href="https://www.chittorgarh.com/" target="_blank" rel="noopener">Chittorgarh</a> (financials, precedents, category subscription) &middot; <a href="https://ipowatch.in/ipo-grey-market-premium-latest-ipo-gmp/" target="_blank" rel="noopener">IPO Watch</a> (second GMP).</p>
-    <p class="fine">GMP is unofficial and can vanish before listing. Calls are mechanical summaries of public data with stated weights, not advice. Verify with the RHP and exchange data before applying.</p>
-  </div>
+  <footer class="foot">
+    <div>GMP is an unofficial, off-exchange indicator and can vanish before listing. Calls are mechanical summaries of public data with stated weights; they are not investment advice. Allotment odds are 1 &divide; retail subscription, because application counts are not published. Verify with the red herring prospectus and exchange data before applying.</div>
+    <div>Sources: <a href="https://www.investorgain.com/report/ipo-gmp-live/331/" target="_blank" rel="noopener">InvestorGain</a>, <a href="https://www.chittorgarh.com/" target="_blank" rel="noopener">Chittorgarh</a>, <a href="https://ipowatch.in/ipo-grey-market-premium-latest-ipo-gmp/" target="_blank" rel="noopener">IPO Watch</a>.<br><span id="srcLine"></span></div>
+  </footer>
+</main>
+
+<div id="layer">
+  <div class="scrim" data-close></div>
+  <aside class="drawer" role="dialog" aria-modal="true" aria-labelledby="dTitle" tabindex="-1">
+    <div class="drawer-head"><div style="flex:1;min-width:0" id="dHead"></div>
+      <button class="icon-btn" type="button" data-close aria-label="Close panel"><svg class="i" viewBox="0 0 24 24"><path d="M18 6 6 18M6 6l12 12"/></svg></button></div>
+    <div class="drawer-body" id="dBody"></div>
+  </aside>
 </div>
 
 <script src="backtest.js"></script>
@@ -216,29 +154,39 @@ svg{display:block}
 const B = window.Backtest, D = window.Decide;
 const IST = "Asia/Kolkata", SNAP_EVERY = 5 * 60e3, LIVE_EVERY = 3 * 60e3, STALE_HOURS = 36;
 const S = { snap: null, snapIpos: [], hist: {}, archive: [], recById: new Map(), rows: [], ins: {}, insByIg: new Map(), ipos: [], seg: "All",
-  live: { on: true, ok: null, at: null, map: null }, plan: new Set(), calls: new Map() };
+  live: { ok: null, at: null, map: null }, plan: new Set(), open: null };
 try { S.seg = localStorage.getItem("ipo-seg") || "All"; S.plan = new Set(JSON.parse(localStorage.getItem("ipo-plan") || "[]")); } catch (e) {}
 const save = () => { try { localStorage.setItem("ipo-seg", S.seg); localStorage.setItem("ipo-plan", JSON.stringify([...S.plan])); } catch (e) {} };
 
-/* ---------- helpers ---------- */
+/* ---------- formatting ---------- */
 const $ = (id) => document.getElementById(id);
 const esc = (s) => String(s ?? "").replace(/[&<>"']/g, (c) => ({ "&": "&amp;", "<": "&lt;", ">": "&gt;", '"': "&quot;", "'": "&#39;" }[c]));
 const todayIST = () => new Intl.DateTimeFormat("en-CA", { timeZone: IST }).format(new Date());
 const dnum = (iso) => Math.floor(Date.UTC(+iso.slice(0, 4), +iso.slice(5, 7) - 1, +iso.slice(8, 10)) / 864e5);
 const dd = (iso) => iso ? new Date(iso + "T00:00:00Z").toLocaleDateString("en-IN", { day: "numeric", month: "short", timeZone: "UTC" }) : null;
-const inr = (n) => n == null || isNaN(n) ? "—" : (n < 0 ? "-" : "") + "₹" + Math.abs(Number(n)).toLocaleString("en-IN", { maximumFractionDigits: Math.abs(n) < 100 && n % 1 ? 2 : 0 });
-const lakh = (n) => n == null ? "—" : Math.abs(n) >= 1e5 ? (n < 0 ? "-" : "") + "₹" + (Math.abs(n) / 1e5).toFixed(2) + " L" : inr(n);
-const pc = (n, d = 0) => n == null || isNaN(n) ? "—" : (n > 0 ? "+" : "") + n.toFixed(d) + "%";
-const pr = (x) => x == null ? "—" : (x * 100).toFixed(0) + "%";
-const sgn = (n) => n > 0 ? "pos" : n < 0 ? "neg" : "zero";
+const inr = (n) => n == null || isNaN(n) ? "—" : (n < 0 ? "−" : "") + "₹" + Math.abs(Number(n)).toLocaleString("en-IN", { maximumFractionDigits: Math.abs(n) < 100 && n % 1 ? 2 : 0 });
+const lakh = (n) => n == null ? "—" : Math.abs(n) >= 1e5 ? (n < 0 ? "−" : "") + "₹" + (Math.abs(n) / 1e5).toFixed(2) + " L" : inr(n);
+const pc = (n, d = 0) => n == null || isNaN(n) ? "—" : (n > 0 ? "+" : n < 0 ? "−" : "") + Math.abs(n).toFixed(d) + "%";
+const pr = (x) => x == null ? "—" : Math.round(x * 100) + "%";
+const sg = (n) => n > 0 ? "pos" : n < 0 ? "neg" : "";
+const words = ["no", "one", "two", "three", "four", "five", "six", "seven", "eight", "nine"];
+const w = (n) => n < 10 ? words[n] : String(n);
+const cap = (s) => s.charAt(0).toUpperCase() + s.slice(1);
 const ago = (ms) => { const m = Math.max(0, Math.round(ms / 60e3)); return m < 1 ? "just now" : m < 60 ? m + " min ago" : m < 2880 ? Math.round(m / 60) + " h ago" : Math.round(m / 1440) + " d ago"; };
 const plain = (h) => new DOMParser().parseFromString(h || "", "text/html").body.textContent.replace(/\s+/g, " ").trim();
 const num = (s) => { const m = String(s ?? "").match(/-?\d[\d,]*\.?\d*/); return m ? parseFloat(m[0].replace(/,/g, "")) : null; };
 const safeUrl = (u) => { if (!u) return null; if (u.startsWith("/")) u = "https://ipowatch.in" + u; return /^https:\/\/(www\.)?(chittorgarh\.com|investorgain\.com|ipowatch\.in)\//.test(u) ? u : null; };
-const span = (a, b) => { const [x, y] = [dd(a), dd(b)]; if (!x || !y) return x || y || ""; const [dx, mx] = x.split(" "), [dy, my] = y.split(" "); return mx === my ? `${dx}–${dy} ${my}` : `${x}–${y}`; };
-const rel = (iso, t) => { const d = dnum(iso) - dnum(t); return d === 0 ? "today" : d === 1 ? "tomorrow" : d > 1 ? "in " + d + " days" : -d + " d ago"; };
+const rel = (iso, t) => { const d = dnum(iso) - dnum(t); return d === 0 ? "today" : d === 1 ? "tomorrow" : d > 1 ? "in " + d + " days" : -d + " days ago"; };
+const ICON = {
+  plus: '<svg class="i" viewBox="0 0 24 24"><path d="M12 5v14M5 12h14"/></svg>',
+  minus: '<svg class="i" viewBox="0 0 24 24"><path d="M5 12h14"/></svg>',
+  chev: '<svg class="i" viewBox="0 0 24 24"><path d="m9 6 6 6-6 6"/></svg>',
+  ext: '<svg class="i" viewBox="0 0 24 24"><path d="M14 4h6v6M20 4 10 14M19 14v5a1 1 0 0 1-1 1H5a1 1 0 0 1-1-1V6a1 1 0 0 1 1-1h5"/></svg>',
+  check: '<svg class="i" viewBox="0 0 24 24"><path d="m5 12 5 5L20 7"/></svg>',
+};
 const inSeg = (seg) => S.seg === "All" || seg === S.seg;
 const ORDER = { APPLY: 0, LOTTERY: 1, CONSIDER: 2, WAIT: 3, SKIP: 4, CLOSED: 5 };
+const LABEL = { APPLY: "Apply", LOTTERY: "Lottery bid", CONSIDER: "Consider", SKIP: "Skip", WAIT: "Await GMP", CLOSED: "Closed" };
 
 function cfg() {
   let u = {}; try { u = JSON.parse(localStorage.getItem("ipo-bt-prefs2") || "{}"); } catch (e) {}
@@ -271,13 +219,12 @@ async function loadSnapshot() {
   if (b.status === "fulfilled") S.hist = b.value;
 }
 async function loadStatic() {
-  const hour = "?t=" + Math.floor(Date.now() / 6e5);
-  const [a, i] = await Promise.allSettled([fetch("archive.json" + hour).then((r) => r.json()), fetch("insights.json" + hour).then((r) => r.json())]);
+  const bust = "?t=" + Math.floor(Date.now() / 6e5);
+  const [a, i] = await Promise.allSettled([fetch("archive.json" + bust).then((r) => r.json()), fetch("insights.json" + bust).then((r) => r.json())]);
   if (a.status === "fulfilled") { S.archive = a.value.records || []; S.recById = new Map(S.archive.map((r) => [r.id, r])); S.rows = B.ledger(S.archive, cfg()); }
   if (i.status === "fulfilled") { S.ins = i.value.ipos || {}; S.insByIg = new Map(Object.values(S.ins).filter((v) => v.ig_id).map((v) => [v.ig_id, v])); }
 }
 async function loadLive() {
-  if (!S.live.on) return;
   const [y, m] = todayIST().split("-").map(Number);
   const fy = m >= 4 ? `${y}-${String(y + 1).slice(2)}` : `${y - 1}-${String(y).slice(2)}`;
   try {
@@ -318,249 +265,246 @@ function compose() {
   });
 }
 
-/* ---------- hero: today's call ---------- */
-function renderHero(t) {
-  const live = S.ipos.filter((p) => inSeg(p.segment) && (p.st === "open" || p.st === "upcoming"));
-  const g = (v) => live.filter((p) => p.call.verdict === v);
-  const apply = g("APPLY"), lot = g("LOTTERY"), cons = g("CONSIDER"), skip = g("SKIP"), wait = g("WAIT");
-  const names = (l) => l.map((p) => `${esc(p.name)}${p.st === "open" && p.close === t ? " <span style=\"color:#E8A39B\">(closes today)</span>" : p.st === "upcoming" ? " (opens " + dd(p.open) + ")" : ""}`).join(", ");
-  const go = apply.concat(lot);
-  const cash = go.reduce((s, p) => s + (p.call.invested || 0), 0) * cfg().accounts;
-  const ev = go.reduce((s, p) => s + (p.call.ev || 0), 0) * cfg().accounts;
-  const closing = live.filter((p) => p.st === "open" && p.close === t).length;
-  let headline;
-  if (!live.length) headline = "No live IPOs in this segment today.";
-  else if (!go.length) headline = cons.length ? `Nothing clear-cut today: ${cons.length} to weigh, ${skip.length} to skip.` : `Sit this one out: ${skip.length + wait.length} live IPO${skip.length + wait.length > 1 ? "s" : ""}, none worth the money.`;
-  else headline = `${apply.length ? apply.length + " to apply" : ""}${apply.length && lot.length ? ", " : ""}${lot.length ? lot.length + " lottery ticket" + (lot.length > 1 ? "s" : "") : ""}${skip.length ? `, ${skip.length} to skip` : ""}.`;
-  const line = (v, l, txt) => l.length ? `<div class="line"><span class="vb v-${v}">${D.LABEL[v]}</span><span>${txt}</span></div>` : "";
-  $("hero").innerHTML = `<div><div class="k">Today's call · ${new Date().toLocaleDateString("en-IN", { weekday: "long", day: "numeric", month: "long", timeZone: IST })}</div>
-    <div class="headline">${headline}</div><div class="lines">
-    ${line("APPLY", apply, names(apply))}${line("LOTTERY", lot, names(lot) + " <span style=\"color:var(--hero-ink2)\">· worth a bid, but expect not to be allotted</span>")}
-    ${line("CONSIDER", cons, names(cons))}${line("SKIP", skip, names(skip))}${line("WAIT", wait, names(wait))}</div></div>
-    <div class="stats">
-      <div class="stat"><div class="k">Cash to bid on the calls</div><div class="v num">${lakh(cash)}</div><div class="h">${go.length} application${go.length === 1 ? "" : "s"} × ${cfg().accounts} account(s), blocked ~4 days</div></div>
-      <div class="stat"><div class="k">Expected profit (odds-weighted)</div><div class="v num" style="color:${ev >= 0 ? "#8FD3B3" : "#F2857D"}">${inr(ev)}</div><div class="h">after charges, before tax</div></div>
-      <div class="stat"><div class="k">Closing today</div><div class="v">${closing}</div><div class="h">UPI mandates must be approved by 5 PM</div></div>
-      <div class="stat"><div class="k">GMP accuracy, last 30 days</div><div class="v num" id="heroAcc">—</div><div class="h" id="heroAccH"></div></div>
-    </div>`;
+/* ---------- derived ---------- */
+const live = () => S.ipos.filter((p) => inSeg(p.segment) && (p.st === "open" || p.st === "upcoming"));
+function band(p) {
+  const ins = p.ins || {}, lo = ins.price_low || p.price_low, hi = ins.price_high || p.price_high || p.price;
+  return lo && hi && lo !== hi ? inr(lo) + "–" + inr(hi).slice(1) : hi ? inr(hi) : null;
+}
+function when(p, t) {
+  if (p.st === "open") return p.close === t ? "Closes today, 5 PM" : "Closes " + dd(p.close) + " (" + rel(p.close, t) + ")";
+  if (p.st === "upcoming") return p.open ? "Opens " + dd(p.open) + " (" + rel(p.open, t) + ")" : "Dates to be announced";
+  if (p.st === "closed") return p.listing ? "Lists " + dd(p.listing) : "Awaiting listing";
+  return "";
+}
+const oddsText = (o) => o.p >= 0.995 ? "Near certain" : "1 in " + o.oneIn;
+function recommendation(p) {
+  const c = p.call, lc = (r) => /^[A-Z]{2}/.test(r.t) ? r.t : r.t.charAt(0).toLowerCase() + r.t.slice(1);
+  const pos = c.reasons.filter((r) => r.kind === "+").slice(0, 2).map(lc), neg = c.reasons.filter((r) => r.kind === "-").slice(0, 2).map(lc);
+  let s = { APPLY: "Apply.", LOTTERY: "Worth a bid, but expect not to be allotted.", CONSIDER: "A judgement call.", SKIP: "Skip.", WAIT: "Wait for a grey-market quote.", CLOSED: "Bidding has closed." }[c.verdict];
+  if (pos.length) s += ` In its favour: ${pos.join("; ")}.`;
+  if (neg.length) s += ` Against it: ${neg.join("; ")}.`;
+  if (c.verdict === "LOTTERY" && c.ev != null) s += ` At ${oddsText(c.odds).toLowerCase()} odds, the expected gain per application is only ${inr(c.ev)}.`;
+  return s;
 }
 
-/* ---------- cards ---------- */
-function ring(score) {
-  const s = score == null ? 0 : score, c = 2 * Math.PI * 25, col = s >= 62 ? "var(--good)" : s >= 45 ? "var(--blue)" : "var(--bad)";
-  return `<div class="ring" aria-label="score ${s} of 100"><svg viewBox="0 0 62 62" width="62" height="62"><circle cx="31" cy="31" r="25" fill="none" stroke="var(--alt)" stroke-width="6"/>`
-    + `<circle cx="31" cy="31" r="25" fill="none" stroke="${col}" stroke-width="6" stroke-linecap="round" stroke-dasharray="${(c * s / 100).toFixed(1)} ${c.toFixed(1)}" transform="rotate(-90 31 31)"/></svg>`
-    + `<span>${score == null ? "—" : s}<small></small></span></div>`;
+/* ---------- today ---------- */
+function renderToday(t) {
+  const L = live(), g = (v) => L.filter((p) => p.call.verdict === v);
+  const ap = g("APPLY"), lo = g("LOTTERY"), co = g("CONSIDER"), sk = g("SKIP").concat(g("WAIT"));
+  $("dateline").textContent = new Date().toLocaleDateString("en-IN", { weekday: "long", day: "numeric", month: "long", year: "numeric", timeZone: IST }) + " · Market brief";
+  const parts = [];
+  if (ap.length) parts.push(`${w(ap.length)} worth applying for`);
+  if (lo.length) parts.push(`${w(lo.length)} lottery bid${lo.length > 1 ? "s" : ""}`);
+  if (co.length) parts.push(`${w(co.length)} to weigh`);
+  if (sk.length) parts.push(`${w(sk.length)} to skip`);
+  $("headline").textContent = !L.length ? "No live IPOs in this segment today." : cap(parts.length > 1 ? parts.slice(0, -1).join(", ") + " and " + parts[parts.length - 1] : parts[0]) + ".";
+  const closing = L.filter((p) => p.st === "open" && p.close === t), lede = [], names = (l) => l.map((p) => esc(p.name)).join(" and ");
+  if (ap.length) lede.push(`The clearest opportunities are ${names(ap)}.`);
+  if (lo.length) lede.push(`${names(lo)} look${lo.length === 1 ? "s" : ""} sound, but allotment odds are slim.`);
+  if (closing.length) lede.push(`${names(closing)} close${closing.length === 1 ? "s" : ""} today at 5 PM.`);
+  $("lede").innerHTML = lede.join(" ");
+  const go = ap.concat(lo), acc = cfg().accounts;
+  const cash = go.reduce((s, p) => s + (p.call.invested || 0), 0) * acc, ev = go.reduce((s, p) => s + (p.call.ev || 0), 0) * acc;
+  const fig = (l, v, h, c) => `<div><div class="l">${l}</div><div class="v num ${c || ""}">${v}</div><div class="h">${h}</div></div>`;
+  $("figures").innerHTML = fig("Cash to bid on the calls", lakh(cash), `${go.length} application${go.length === 1 ? "" : "s"}, blocked about 4 days`)
+    + fig("Expected profit, odds-weighted", inr(ev), "after charges, before tax", sg(ev))
+    + fig("Closing today", String(closing.length), closing.length ? "approve UPI mandates by 5 PM" : "nothing urgent")
+    + `<div><div class="l">GMP accuracy, last 30 days</div><div class="v num" id="accV">—</div><div class="h" id="accH"></div></div>`;
 }
-function factorBars(call) {
-  const names = { signal: "GMP signal", history: "History", demand: "Demand", valuation: "Valuation", fundamentals: "Fundamentals", structure: "Structure" };
-  return Object.keys(D.W).map((k) => {
-    const f = call.factors[k];
-    if (!f) return `<div class="fbar"><span class="muted">${names[k]}</span><div class="bar"></div><span class="note">no data</span></div>`;
-    const col = f.s >= 0.65 ? "var(--good)" : f.s >= 0.4 ? "var(--blue)" : "var(--bad)";
-    return `<div class="fbar"><span>${names[k]} <span class="muted">${D.W[k]}</span></span><div class="bar"><i style="width:${(f.s * 100).toFixed(0)}%;background:${col}"></i></div><span class="note">${esc(f.note)}</span></div>`;
-  }).join("");
-}
-function finTable(ins) {
-  const f = ins && ins.financials;
-  if (!f || !f.periods) return "";
-  const cols = f.periods.slice(0, 4);
-  const row = (k, l) => f[k] ? `<tr><td>${l}</td>${cols.map((_, i) => `<td class="num">${f[k][i] == null ? "—" : f[k][i].toLocaleString("en-IN")}</td>`).join("")}</tr>` : "";
-  return `<table class="mt"><thead><tr><th>₹ Cr</th>${cols.map((c) => `<th>${esc(c.replace(/^\d+ /, ""))}</th>`).join("")}</tr></thead><tbody>`
-    + row("Total Income", "Revenue") + row("Profit After Tax", "Profit") + row("NET Worth", "Net worth") + row("Total Borrowing", "Debt") + "</tbody></table>";
-}
-function precTable(ins) {
-  const p = ins && ins.precedents;
-  if (!p || !p.length) return "";
-  return `<table class="mt"><thead><tr><th>Recent same-sector IPOs</th><th>P/E</th><th>Listing</th><th>Now vs issue</th></tr></thead><tbody>`
-    + p.slice(0, 5).map((x) => `<tr><td>${esc(x.name.replace(/ Ltd\.?$/, ""))} <span class="muted">${x.segment === "SME" ? "SME" : ""}</span></td><td class="num">${x.pe == null ? "—" : x.pe.toFixed(1)}</td>`
-      + `<td class="num ${x.listing_gain_pct >= 0 ? "good" : "bad"}">${pc(x.listing_gain_pct)}</td><td class="num">${x.ltp && x.price ? pc((x.ltp / x.price - 1) * 100) : "—"}</td></tr>`).join("") + "</tbody></table>";
-}
-function card(p, t) {
-  const c = p.call, sme = p.segment === "SME", ins = p.ins || {}, sub = ins.sub || {};
-  let when = "";
-  if (p.st === "open") when = p.close === t ? "Closes today, 5 PM" : "Closes " + dd(p.close) + " · " + rel(p.close, t);
-  else if (p.st === "upcoming") when = p.open ? "Opens " + dd(p.open) + " · " + rel(p.open, t) : "Dates TBA";
-  else if (p.st === "closed") when = p.listing ? "Lists " + dd(p.listing) : "Awaiting listing";
-  const sc = c.scenarios;
-  const odds = c.odds;
-  const oddsTxt = odds.p >= 0.999 ? "~certain" : "1 in " + odds.oneIn;
-  const lo = ins.price_low || p.price_low, hi = ins.price_high || p.price_high || p.price;
-  const band = lo && hi && lo !== hi ? inr(lo) + "–" + inr(hi).slice(1) : hi ? inr(hi) + (p.st === "closed" ? " issue price" : "") : null;
-  const est = p.price && p.gmp != null ? inr(p.price + p.gmp) : null;
-  const pe = ins.loss_making ? "loss-making" : ins.pe_post ? ins.pe_post.toFixed(0) + "x P/E" : null;
-  const reasons = c.reasons.slice(0, 5).map((r) => `<li><span class="i ${r.kind === "+" ? "p" : "m"}">${r.kind === "+" ? "+" : "−"}</span><span>${esc(r.t)}</span></li>`).join("")
-    || '<li><span class="i p">·</span><span class="muted">Not enough data for reasons yet.</span></li>';
-  const link = safeUrl(p.ch_url) || safeUrl(ins.ch_url) || safeUrl(p.ig_url);
-  const subLine = sub.qib != null ? `QIB ${sub.qib}x · NII ${sub.nii}x · Retail ${sub.retail}x` : p.subscription_x != null ? `Total ${p.subscription_x}x` : "Not open yet";
-  return `<article class="card ${c.verdict}">
-    <div class="c-top"><div><span class="vb v-${c.verdict}">${D.LABEL[c.verdict]}</span><div class="c-name" style="margin-top:8px">${esc(p.name)}</div>
-      <div class="c-meta"><span class="tag ${sme ? "t-sme" : "t-main"}">${sme ? esc(p.exchange || "SME") : "Mainboard"}</span><span class="when ${p.close === t && p.st === "open" ? "hot" : ""}">${esc(when)}</span>${band ? `<span>Band <b class="num">${band}</b></span>` : ""}${est ? `<span>Est. listing <b class="num">${est}</b></span>` : ""}${pe ? `<span>${esc(pe)}</span>` : ""}</div></div>
-      <div style="text-align:center">${ring(c.score)}<div class="sub" style="font-size:10.5px">confidence ${pr(c.confidence)}</div></div></div>
-    <div class="kpis">
-      <div class="kpi"><div class="l">GMP</div><div class="v">${p.gmp == null ? "—" : inr(p.gmp)}</div><div class="h">${p.pctv == null ? "none yet" : pc(p.pctv) + (p.trend > 0 ? " ▲" : p.trend < 0 ? " ▼" : "")}</div></div>
-      <div class="kpi"><div class="l">Allotment odds</div><div class="v">${oddsTxt}</div><div class="h">${esc(odds.basis)}</div></div>
-      <div class="kpi"><div class="l">Expected / app</div><div class="v ${c.ev >= 0 ? "good" : "bad"}">${c.ev == null ? "—" : inr(c.ev)}</div><div class="h">odds × base case</div></div>
-      <div class="kpi"><div class="l">Ticket</div><div class="v">${c.invested ? inr(c.invested) : "—"}</div><div class="h">${p.lot ? (sme ? "2 lots" : "1 lot") + " of " + p.lot : "min application"}</div></div>
-    </div>
-    ${sc ? `<div class="scen"><div><div class="l">Bear</div><div class="v ${sc.bear.pct < 0 ? "bad" : ""}">${pc(sc.bear.pct)}</div><div class="h">${inr(sc.bear.net)} if allotted</div></div>
-      <div><div class="l">Base</div><div class="v">${pc(sc.base.pct)}</div><div class="h">${inr(sc.base.net)} if allotted</div></div>
-      <div><div class="l">Bull</div><div class="v good">${pc(sc.bull.pct)}</div><div class="h">${inr(sc.bull.net)} if allotted</div></div></div>` : ""}
-    <ul class="why">${reasons}</ul>
-    <details class="more"><summary>Full analysis</summary>
-      <div style="margin-top:8px">${factorBars(c)}</div>
-      <div class="sub" style="margin:8px 0 2px">Demand: ${esc(subLine)}${ins.issue_size_cr ? ` · Issue ₹${Math.round(ins.issue_size_cr)} Cr (${ins.fresh_cr != null ? Math.round(ins.fresh_cr / ins.issue_size_cr * 100) + "% fresh" : "—"})` : ""}${ins.promoter_post ? ` · Promoters ${ins.promoter_pre}% → ${ins.promoter_post}%` : ""}${ins.mcap_cr ? ` · M-cap ₹${Math.round(ins.mcap_cr).toLocaleString("en-IN")} Cr` : ""}</div>
-      ${finTable(ins)}${precTable(ins)}
-      ${ins.reviews && (ins.reviews.subscribe + ins.reviews.may_apply + ins.reviews.neutral + ins.reviews.avoid) ? `<div class="sub" style="margin-top:6px">Broker reviews: ${ins.reviews.subscribe} subscribe · ${ins.reviews.may_apply} may apply · ${ins.reviews.neutral} neutral · ${ins.reviews.avoid} avoid</div>` : ""}
-    </details>
-    <div class="c-foot"><label class="plan"><input type="checkbox" data-plan="${esc(p.id)}" ${S.plan.has(p.id) ? "checked" : ""}> Add to plan</label>${link ? `<a href="${link}" target="_blank" rel="noopener">RHP details ↗</a>` : ""}</div>
-  </article>`;
+
+/* ---------- calls ---------- */
+function row(p, t) {
+  const c = p.call, s = c.scenarios, sme = p.segment === "SME", hot = p.st === "open" && p.close === t;
+  return `<button class="row ${c.verdict === "SKIP" || c.verdict === "CLOSED" ? "dim" : ""}" type="button" data-open="${esc(p.id)}" aria-label="${esc(p.name)}: ${LABEL[c.verdict]}. Open analysis">
+    <div><span class="tag t-${c.verdict}">${LABEL[c.verdict]}</span><div class="score">Score ${c.score ?? "—"} / 100</div></div>
+    <div><div class="name">${esc(p.name)}</div><div class="meta"><span class="chip ${sme ? "sme" : ""}">${sme ? esc(p.exchange || "SME") : "Mainboard"}</span>${band(p) ? `<span class="num">${band(p)}</span>` : ""}<span class="${hot ? "hot" : ""}">${esc(when(p, t))}</span>${S.plan.has(p.id) ? `<span class="pos">${ICON.check} In plan</span>` : ""}</div></div>
+    <div class="v num"><b>${p.gmp == null ? "—" : inr(p.gmp)}</b><small>${p.pctv == null ? "no quote yet" : pc(p.pctv) + (p.trend > 0 ? ", rising" : p.trend < 0 ? ", falling" : "")}</small></div>
+    <div class="v num"><b>${oddsText(c.odds)}</b><small>${esc(c.odds.basis)}</small></div>
+    <div class="v num"><b class="${sg(c.ev)}">${c.ev == null ? "—" : inr(c.ev)}</b><small>${c.invested ? "on " + inr(c.invested) : ""}</small></div>
+    <div class="v num"><b>${s ? pc(s.base.pct) : "—"}</b><small>${s ? "bear " + pc(s.bear.pct) : ""}</small></div>
+    <span class="chev" aria-hidden="true">${ICON.chev}</span></button>`;
 }
 function renderCalls(t) {
-  const live = S.ipos.filter((p) => inSeg(p.segment) && (p.st === "open" || p.st === "upcoming"))
-    .sort((a, b) => ORDER[a.call.verdict] - ORDER[b.call.verdict] || (b.call.score || 0) - (a.call.score || 0));
-  $("calls").innerHTML = live.length ? live.map((p) => card(p, t)).join("") : '<div class="empty" style="grid-column:1/-1">No IPOs open or announced in this segment.</div>';
+  const n = (s) => S.ipos.filter((p) => (s === "All" || p.segment === s) && (p.st === "open" || p.st === "upcoming")).length;
+  $("seg").innerHTML = ["All", "Mainboard", "SME"].map((s) => `<button type="button" data-seg="${s}" aria-pressed="${S.seg === s}">${s}<span class="c">${n(s)}</span></button>`).join("");
+  const L = live().sort((a, b) => ORDER[a.call.verdict] - ORDER[b.call.verdict] || (b.call.score || 0) - (a.call.score || 0));
   const closed = S.ipos.filter((p) => inSeg(p.segment) && p.st === "closed");
-  $("awaitSec").hidden = !closed.length;
-  $("await").innerHTML = closed.map((p) => card(p, t)).join("");
+  $("list").innerHTML = (L.length ? L.map((p) => row(p, t)).join("") : '<div class="empty">No IPOs are open or announced in this segment.</div>')
+    + (closed.length ? `<div class="group-label">Bidding closed, listing soon</div>` + closed.map((p) => row(p, t)).join("") : "");
 }
 
-/* ---------- last 30 days: GMP vs reality ---------- */
-function realRows(t) {
-  const cut = dnum(t) - 30;
-  return S.rows.filter((r) => inSeg(r.segment) && r.gainPct != null && dnum(r.listing) >= cut && dnum(r.listing) <= dnum(t))
-    .map((r) => {
-      const ins = S.insByIg.get(r.id), retail = ins && ins.sub && ins.sub.retail;
-      const odds = retail ? Math.min(1, 1 / retail) : r.p;
-      const g = r.gmpList != null ? r.gmpList / r.price * 100 : null;
-      return Object.assign({}, r, { gEve: g, gClose: r.sigKind === "close" ? r.gmpPct : null, retail, odds, oddsBasis: retail ? "retail" : "total",
-        realistic: odds * r.netAllot, rec: S.recById.get(r.id) });
-    }).sort((a, b) => (a.listing < b.listing ? 1 : -1));
+/* ---------- drawer ---------- */
+function drawerIPO(p) {
+  const t = todayIST(), c = p.call, ins = p.ins || {}, s = c.scenarios, sub = ins.sub || {}, sme = p.segment === "SME";
+  $("dHead").innerHTML = `<span class="tag t-${c.verdict}">${LABEL[c.verdict]}</span><span class="muted" style="font-size:12.5px;margin-left:10px">Score ${c.score ?? "—"} / 100 · confidence ${pr(c.confidence)}</span>
+    <h3 class="dt" id="dTitle">${esc(p.name)}</h3>
+    <div class="dmeta"><span class="chip ${sme ? "sme" : ""}">${sme ? esc(p.exchange || "SME") : "Mainboard"}</span>${band(p) ? `<span class="num">Band ${band(p)}</span>` : ""}<span>${esc(when(p, t))}</span>${ins.loss_making ? "<span>Loss-making</span>" : ins.pe_post ? `<span>P/E ${ins.pe_post.toFixed(0)}x</span>` : ""}</div>`;
+  let range = "";
+  if (s) {
+    const lo = Math.min(0, s.bear.pct) - 5, hi = Math.max(0, s.bull.pct) + 5, X = (v) => ((v - lo) / (hi - lo) * 100).toFixed(1) + "%";
+    range = `<div class="d-sec"><h4>Outcome range if allotted</h4><div class="range" aria-hidden="true"><div class="track"></div><div class="zero" style="left:${X(0)}"></div>
+      <div class="span" style="left:${X(s.bear.pct)};width:calc(${X(s.bull.pct)} - ${X(s.bear.pct)})"></div>
+      <div class="pt" style="left:${X(s.bear.pct)}"></div><div class="pt base" style="left:${X(s.base.pct)}"></div><div class="pt" style="left:${X(s.bull.pct)}"></div></div>
+      <div class="range-l num"><div>Bear<b class="${sg(s.bear.pct)}">${pc(s.bear.pct)}</b>${inr(s.bear.net)}</div><div>Base<b>${pc(s.base.pct)}</b>${inr(s.base.net)}</div><div>Bull<b class="pos">${pc(s.bull.pct)}</b>${inr(s.bull.net)}</div></div>
+      <p class="note">Base blends today's GMP with how similar IPOs actually listed; bear and bull are their worst and best 10%.</p></div>`;
+  }
+  const names = { signal: "GMP signal", history: "History", demand: "Demand", valuation: "Valuation", fundamentals: "Fundamentals", structure: "Structure" };
+  const facs = Object.keys(D.W).map((k) => { const f = c.factors[k];
+    if (!f) return `<div class="fac"><span class="muted">${names[k]}</span><div class="meter"></div><span class="w">${D.W[k]}</span><span class="note">No data</span></div>`;
+    const col = f.s >= 0.65 ? "var(--good)" : f.s >= 0.4 ? "var(--gold)" : "var(--bad)";
+    return `<div class="fac"><span>${names[k]}</span><div class="meter"><i style="width:${Math.round(f.s * 100)}%;background:${col}"></i></div><span class="w">${D.W[k]}</span><span class="note">${esc(f.note)}</span></div>`; }).join("");
+  const fin = ins.financials;
+  const finT = fin && fin.periods ? `<div class="d-sec"><h4>Financials, ₹ crore</h4><div class="scroll-x"><table class="tbl"><thead><tr><th></th>${fin.periods.slice(0, 4).map((x) => `<th>${esc(x.replace(/^\d+ /, ""))}</th>`).join("")}</tr></thead><tbody>`
+    + [["Total Income", "Revenue"], ["Profit After Tax", "Profit"], ["NET Worth", "Net worth"], ["Total Borrowing", "Debt"]].filter(([k]) => fin[k]).map(([k, l]) => `<tr><td>${l}</td>${fin.periods.slice(0, 4).map((_, i) => `<td class="num">${fin[k][i] == null ? "—" : fin[k][i].toLocaleString("en-IN")}</td>`).join("")}</tr>`).join("") + "</tbody></table></div></div>" : "";
+  const prec = ins.precedents && ins.precedents.length ? `<div class="d-sec"><h4>Recent IPOs in the same sector</h4><div class="scroll-x"><table class="tbl"><thead><tr><th>Company</th><th>P/E</th><th>Listing</th><th>Since issue</th></tr></thead><tbody>`
+    + ins.precedents.slice(0, 5).map((x) => `<tr><td>${esc(x.name.replace(/ Ltd\.?$/, ""))}${x.segment === "SME" ? ' <span class="chip sme">SME</span>' : ""}</td><td class="num">${x.pe == null ? "—" : x.pe.toFixed(1)}</td><td class="num ${sg(x.listing_gain_pct)}">${pc(x.listing_gain_pct, 1)}</td><td class="num">${x.ltp && x.price ? pc((x.ltp / x.price - 1) * 100) : "—"}</td></tr>`).join("") + "</tbody></table></div></div>" : "";
+  const demand = sub.qib != null ? `Institutions ${sub.qib}x, HNI ${sub.nii}x, retail ${sub.retail}x` : p.subscription_x != null ? `Total ${p.subscription_x}x` : "Bidding not open yet";
+  const link = safeUrl(p.ch_url) || safeUrl(ins.ch_url) || safeUrl(p.ig_url);
+  $("dBody").innerHTML = `<p class="rec">${esc(recommendation(p))}</p>
+    <div class="d-figs num"><div><div class="l">Grey-market premium</div><div class="v">${p.gmp == null ? "—" : inr(p.gmp)}</div><div class="h">${pc(p.pctv, 1)} on the upper band</div></div>
+      <div><div class="l">Allotment odds</div><div class="v">${oddsText(c.odds)}</div><div class="h">${esc(c.odds.basis)}</div></div>
+      <div><div class="l">Expected per application</div><div class="v ${sg(c.ev)}">${c.ev == null ? "—" : inr(c.ev)}</div><div class="h">odds × base case, after charges</div></div>
+      <div><div class="l">Minimum application</div><div class="v">${c.invested ? inr(c.invested) : "—"}</div><div class="h">${p.lot ? (sme ? "2 lots of " : "1 lot of ") + p.lot + " shares" : ""}</div></div></div>
+    ${range}
+    <div class="d-sec"><h4>What drives the call</h4><ul class="why">${c.reasons.slice(0, 6).map((r) => `<li><span class="${r.kind === "+" ? "p" : "m"}">${r.kind === "+" ? ICON.plus : ICON.minus}</span><span>${esc(r.t)}</span></li>`).join("") || '<li class="muted">Not enough data yet.</li>'}</ul></div>
+    <div class="d-sec"><h4>Score breakdown · weight</h4>${facs}</div>
+    <div class="d-sec"><h4>Demand and structure</h4><p style="margin:0;font-size:14px">${esc(demand)}${ins.issue_size_cr ? ` · issue ₹${Math.round(ins.issue_size_cr).toLocaleString("en-IN")} Cr, ${Math.round((ins.fresh_cr || 0) / ins.issue_size_cr * 100)}% fresh` : ""}${ins.promoter_post ? ` · promoters ${ins.promoter_pre}% → ${ins.promoter_post}%` : ""}${ins.mcap_cr ? ` · market cap ₹${Math.round(ins.mcap_cr).toLocaleString("en-IN")} Cr` : ""}</p></div>
+    ${finT}${prec}
+    <div class="d-actions"><button class="btn ${S.plan.has(p.id) ? "" : "primary"}" type="button" data-plan="${esc(p.id)}">${S.plan.has(p.id) ? ICON.check + " In your plan" : ICON.plus + " Add to plan"}</button>${link ? `<a class="btn" href="${link}" target="_blank" rel="noopener">Prospectus details ${ICON.ext}</a>` : ""}</div>`;
 }
-function sparkPath(rec, price, actual) {
-  const pts = ((rec && rec.series) || []).filter((x) => x[1] != null).map((x) => [dnum(x[0]), x[1] / price * 100]);
-  const W = 110, H = 30;
-  if (!pts.length) return `<svg width="${W}" height="${H}"></svg>`;
-  const xs = pts.map((p) => p[0]), ys = pts.map((p) => p[1]).concat([actual]);
-  const x0 = Math.min(...xs), x1 = Math.max(...xs) + 1, y0 = Math.min(0, ...ys), y1 = Math.max(1, ...ys);
-  const X = (x) => 4 + (x - x0) / Math.max(1, x1 - x0) * (W - 14), Y = (y) => 3 + (1 - (y - y0) / (y1 - y0)) * (H - 6);
-  const d = pts.map((p, i) => `${i ? "L" : "M"}${X(p[0]).toFixed(1)} ${Y(p[1]).toFixed(1)}`).join("");
-  return `<svg width="${W}" height="${H}" role="img" aria-label="GMP path then actual listing"><line x1="0" x2="${W}" y1="${Y(0).toFixed(1)}" y2="${Y(0).toFixed(1)}" stroke="var(--line)"/>`
-    + `<path d="${d}" fill="none" stroke="var(--ink3)" stroke-width="1.6"/>`
-    + `<circle cx="${W - 5}" cy="${Y(actual).toFixed(1)}" r="3.6" fill="${actual >= 0 ? "var(--good)" : "var(--bad)"}"/></svg>`;
-}
-function scatter(rows) {
-  const pts = rows.filter((r) => r.gEve != null);
-  if (pts.length < 3) return '<div class="sub">Not enough listings yet.</div>';
-  const W = 520, H = 260, L = 40, R = 10, T = 10, Bm = 28;
-  const lo = Math.min(-20, ...pts.map((r) => Math.min(r.gEve, r.gainPct))), hi = Math.max(40, ...pts.map((r) => Math.max(r.gEve, r.gainPct)));
-  const X = (v) => L + (v - lo) / (hi - lo) * (W - L - R), Y = (v) => T + (1 - (v - lo) / (hi - lo)) * (H - T - Bm);
-  const ticks = [lo, 0, Math.round(hi / 2), hi].map(Math.round);
-  return `<svg viewBox="0 0 ${W} ${H}" width="100%" role="img" aria-label="GMP versus actual listing gain">`
-    + ticks.map((v) => `<line x1="${L}" x2="${W - R}" y1="${Y(v)}" y2="${Y(v)}" stroke="var(--line)"/><text x="${L - 4}" y="${Y(v) + 3}" font-size="10" text-anchor="end" fill="var(--ink3)">${v}%</text><text x="${X(v)}" y="${H - 12}" font-size="10" text-anchor="middle" fill="var(--ink3)">${v}%</text>`).join("")
-    + `<line x1="${X(lo)}" y1="${Y(lo)}" x2="${X(hi)}" y2="${Y(hi)}" stroke="var(--ink3)" stroke-dasharray="4 4"/>`
-    + `<text x="${X(hi) - 4}" y="${Y(hi) + 14}" font-size="10" text-anchor="end" fill="var(--ink3)">GMP = actual</text>`
-    + pts.map((r) => `<circle cx="${X(r.gEve).toFixed(1)}" cy="${Y(r.gainPct).toFixed(1)}" r="4.5" fill="${r.segment === "SME" ? "var(--sme)" : "var(--accent)"}" fill-opacity=".75"><title>${esc(r.name)}: GMP ${pc(r.gEve)} → listed ${pc(r.gainPct, 1)}</title></circle>`).join("")
-    + `<text x="${(L + W) / 2}" y="${H - 1}" font-size="10.5" text-anchor="middle" fill="var(--ink2)">GMP the evening before listing</text></svg>`
-    + `<div class="sub">Purple = SME, brown = mainboard. Points below the dashed line listed worse than GMP said.</div>`;
-}
-function renderReality(t) {
-  const rows = realRows(t);
-  $("realSub").textContent = `${rows.length} listings · ${S.seg === "All" ? "all segments" : S.seg}`;
-  if (!rows.length) { $("realTiles").innerHTML = ""; $("scatter").innerHTML = ""; $("realApply").innerHTML = ""; $("real").innerHTML = '<tbody><tr><td class="muted">No listings in the last 30 days.</td></tr></tbody>'; return; }
-  const withG = rows.filter((r) => r.gEve != null);
-  const avg = (a, f) => a.length ? a.reduce((s, x) => s + f(x), 0) / a.length : null;
-  const gAvg = avg(withG, (r) => r.gEve), aAvg = avg(rows, (r) => r.gainPct);
-  const miss = avg(withG, (r) => Math.abs(r.gEve - r.gainPct)), bias = avg(withG, (r) => r.gEve - r.gainPct);
-  const dir = withG.length ? withG.filter((r) => (r.gEve > 2) === (r.gainPct > 0)).length / withG.length : null;
-  const tile = (l, v, h, c) => `<div class="tile"><div class="l">${l}</div><div class="v num ${c || ""}">${v}</div><div class="h">${h}</div></div>`;
-  $("realTiles").innerHTML = tile("GMP said (avg)", pc(gAvg, 1), `${withG.length} listings with GMP`) + tile("Actually listed (avg)", pc(aAvg, 1), `median ${pc(rows.map((r) => r.gainPct).sort((a, b) => a - b)[Math.floor(rows.length / 2)], 1)}`, aAvg >= 0 ? "good" : "bad")
-    + tile("Typical GMP miss", miss == null ? "—" : miss.toFixed(1) + " pts", `GMP ran ${bias > 0 ? "high" : "low"} by ${Math.abs(bias || 0).toFixed(1)} pts on average`)
-    + tile("Direction right", pr(dir), "GMP > 2% and listed up, or not");
-  $("heroAcc").textContent = miss == null ? "—" : "±" + miss.toFixed(0) + " pts";
-  $("heroAccH").textContent = dir == null ? "" : `typical miss · direction right ${pr(dir)} of the time`;
-  $("scatter").innerHTML = scatter(rows);
-  const seg = (s) => {
-    const l = rows.filter((r) => r.segment === s);
-    if (!l.length) return "";
-    const exp = l.reduce((a, r) => a + r.odds, 0), pnl = l.reduce((a, r) => a + r.realistic, 0);
-    const naive = l.reduce((a, r) => a + r.netAllot, 0);
-    const wGain = l.reduce((a, r) => a + r.odds * r.gainPct, 0) / Math.max(1e-9, exp);
-    const cap = l.reduce((a, r) => a + r.invested, 0);
-    return `<tr><td><b>${s === "SME" ? "SME" : "Mainboard"}</b></td><td class="num">${l.length}</td><td class="num">${exp.toFixed(1)}</td><td class="num">${pc(avg(l, (r) => r.gainPct), 1)}</td><td class="num ${wGain >= 0 ? "good" : "bad"}">${pc(wGain, 1)}</td>`
-      + `<td class="num">${lakh(naive)}</td><td class="num ${pnl >= 0 ? "good" : "bad"}"><b>${inr(pnl)}</b></td></tr>`;
-  };
-  $("realApply").innerHTML = `<div class="scroll"><table class="mt" style="font-size:12.5px"><thead><tr><th></th><th>Bids</th><th>Allotted (exp.)</th><th>Avg gain</th><th>You'd get</th><th>Fantasy P&amp;L</th><th>Realistic</th></tr></thead><tbody>${seg("Mainboard")}${seg("SME")}</tbody></table></div>`
-    + `<p class="sub" style="margin:10px 0 0">&ldquo;Fantasy P&amp;L&rdquo; (allotted every time) is the number most GMP sites imply. &ldquo;Realistic&rdquo; multiplies each IPO by its retail allotment odds (1 &divide; retail subscription): the hot IPOs you'd rarely get, the weak ones you'd usually get. One application per IPO, sold at the listing price, after charges.</p>`;
-  $("real").innerHTML = `<thead><tr><th>IPO</th><th>Seg</th><th>Listed</th><th>GMP path → actual</th><th>GMP @close</th><th>GMP eve</th><th>Actual</th><th>Miss</th><th>Retail sub</th><th>Odds</th><th>If allotted</th><th>Realistic</th></tr></thead><tbody>`
-    + rows.map((r) => {
-      const m = r.gEve != null ? r.gEve - r.gainPct : null;
-      return `<tr><td>${esc(r.name)}</td><td>${r.segment === "SME" ? "SME" : "Main"}</td><td class="num">${dd(r.listing)}</td><td>${sparkPath(r.rec, r.price, r.gainPct)}</td>`
-        + `<td class="num">${r.gClose == null ? "—" : pc(r.gClose)}</td><td class="num">${r.gEve == null ? "—" : pc(r.gEve)}</td><td><span class="chg ${sgn(r.gainPct)} num">${pc(r.gainPct, 1)}</span></td>`
-        + `<td class="num ${m > 5 ? "bad" : m < -5 ? "good" : ""}">${m == null ? "—" : (m > 0 ? "+" : "") + m.toFixed(0) + " pts"}</td><td class="num">${r.retail ? r.retail + "x" : r.subClose ? r.subClose + "x*" : "—"}</td>`
-        + `<td class="num">${r.odds >= 0.999 ? "~100%" : "1 in " + Math.round(1 / r.odds)}</td><td class="num ${r.netAllot >= 0 ? "good" : "bad"}">${inr(r.netAllot)}</td><td class="num ${r.realistic >= 0 ? "good" : "bad"}"><b>${inr(r.realistic)}</b></td></tr>`;
-    }).join("") + `</tbody>`;
-}
-
-/* ---------- planner ---------- */
-function renderPlanner(t) {
+function drawerPlan() {
+  const t = todayIST(), acc = cfg().accounts;
   const items = S.ipos.filter((p) => S.plan.has(p.id) && p.st !== "listed" && p.call);
-  if (!items.length) { $("planner").innerHTML = '<div class="empty">Tick <b>Add to plan</b> on any call to see the cash you need, when it is blocked, and when it comes back.</div>'; return; }
-  const acc = cfg().accounts;
-  const rows = items.map((p) => {
-    const amt = (p.call.invested || cfg().ticket[p.segment]) * acc, bid = p.close && p.close >= t ? p.close : t, listing = p.listing || B.addWd(bid, 3);
-    return { p, amt, bid, refund: B.addWd(bid, 2), release: B.addWd(listing, 1), ev: (p.call.ev || 0) * acc };
-  }).sort((a, b) => (a.bid < b.bid ? -1 : 1));
+  $("dHead").innerHTML = `<div class="kicker">Your plan</div><h3 class="dt" id="dTitle">Cash needed, and when it comes back</h3>`;
+  if (!items.length) { $("dBody").innerHTML = `<p class="soft">Open any IPO and choose <b>Add to plan</b>. The plan shows how much cash each bid blocks, when it is refunded if you are not allotted, and when it returns after a sale.</p>`; return; }
+  const rows = items.map((p) => { const amt = (p.call.invested || cfg().ticket[p.segment]) * acc, bid = p.close && p.close >= t ? p.close : t;
+    return { p, amt, bid, refund: B.addWd(bid, 2), release: B.addWd(p.listing || B.addWd(bid, 3), 1), ev: (p.call.ev || 0) * acc }; }).sort((a, b) => (a.bid < b.bid ? -1 : 1));
   let peak = 0, peakDay = null;
   for (let d = Math.min(...rows.map((r) => dnum(r.bid))); d <= Math.max(...rows.map((r) => dnum(r.release))); d++) {
     const v = rows.reduce((s, r) => s + (d >= dnum(r.bid) && d < dnum(r.refund) ? r.amt : 0), 0);
     if (v > peak) { peak = v; peakDay = new Date(d * 864e5).toISOString().slice(0, 10); }
   }
   const ev = rows.reduce((s, r) => s + r.ev, 0);
-  $("planner").innerHTML = `<div class="tiles" style="grid-template-columns:repeat(3,1fr)"><div class="tile"><div class="l">Peak cash blocked</div><div class="v num">${lakh(peak)}</div><div class="h">on ${dd(peakDay)}</div></div>`
-    + `<div class="tile"><div class="l">Applications</div><div class="v">${rows.length * acc}</div><div class="h">${acc} account(s)</div></div>`
-    + `<div class="tile"><div class="l">Expected profit</div><div class="v num ${ev >= 0 ? "good" : "bad"}">${inr(ev)}</div><div class="h">odds-weighted</div></div></div>`
-    + `<div class="scroll"><table class="t"><thead><tr><th>IPO</th><th>Call</th><th>Amount</th><th>Bid by</th><th>Refund if not allotted</th><th>Free after sale</th></tr></thead><tbody>`
-    + rows.map((r) => `<tr><td>${esc(r.p.name)}</td><td><span class="vb v-${r.p.call.verdict}">${D.LABEL[r.p.call.verdict]}</span></td><td class="num">${inr(r.amt)}</td><td class="num">${dd(r.bid)}</td><td class="num">${dd(r.refund)}</td><td class="num">${dd(r.release)}</td></tr>`).join("")
-    + "</tbody></table></div>";
+  $("dBody").innerHTML = `<div class="d-figs num"><div><div class="l">Peak cash blocked</div><div class="v">${lakh(peak)}</div><div class="h">on ${dd(peakDay)}</div></div>
+      <div><div class="l">Expected profit</div><div class="v ${sg(ev)}">${inr(ev)}</div><div class="h">odds-weighted, ${rows.length * acc} application${rows.length * acc === 1 ? "" : "s"}</div></div></div>
+    <div class="scroll-x"><table class="tbl"><thead><tr><th>IPO</th><th>Amount</th><th>Bid by</th><th>Refund</th><th>Back after sale</th><th></th></tr></thead><tbody>`
+    + rows.map((r) => `<tr><td><span class="tag t-${r.p.call.verdict}" style="font-weight:500">${esc(r.p.name)}</span></td><td class="num">${inr(r.amt)}</td><td class="num">${dd(r.bid)}</td><td class="num">${dd(r.refund)}</td><td class="num">${dd(r.release)}</td><td><button class="icon-btn" style="width:30px;height:30px" type="button" data-plan="${esc(r.p.id)}" aria-label="Remove ${esc(r.p.name)} from plan">${ICON.minus}</button></td></tr>`).join("")
+    + `</tbody></table></div><p class="note">Refund applies if you are not allotted (about two working days after bidding closes). If allotted, cash returns the day after you sell on listing.</p>`;
+}
+let lastFocus = null;
+function openDrawer(kind, id) {
+  if (kind === "ipo") { const p = S.ipos.find((x) => x.id === id && x.call); if (!p) return; lastFocus = document.activeElement; S.open = { kind, id }; drawerIPO(p); history.replaceState(null, "", "#ipo=" + encodeURIComponent(id)); }
+  else { lastFocus = document.activeElement; S.open = { kind }; drawerPlan(); history.replaceState(null, "", "#plan"); }
+  $("layer").classList.add("open"); document.body.style.overflow = "hidden";
+  $("dBody").scrollTop = 0; document.querySelector(".drawer").focus();
+}
+function closeDrawer() {
+  if (!S.open) return;
+  S.open = null; $("layer").classList.remove("open"); document.body.style.overflow = "";
+  history.replaceState(null, "", location.pathname + location.search);
+  if (lastFocus) lastFocus.focus();
+}
+
+/* ---------- track record ---------- */
+function realRows(t) {
+  const cut = dnum(t) - 30;
+  return S.rows.filter((r) => inSeg(r.segment) && r.gainPct != null && dnum(r.listing) >= cut && dnum(r.listing) <= dnum(t)).map((r) => {
+    const ins = S.insByIg.get(r.id), retail = ins && ins.sub && ins.sub.retail, odds = retail ? Math.min(1, 1 / retail) : r.p;
+    return Object.assign({}, r, { gEve: r.gmpList != null ? r.gmpList / r.price * 100 : null, gClose: r.sigKind === "close" ? r.gmpPct : null, retail, odds, realistic: odds * r.netAllot, rec: S.recById.get(r.id) });
+  }).sort((a, b) => (a.listing < b.listing ? 1 : -1));
+}
+function spark(rec, price, actual) {
+  const pts = ((rec && rec.series) || []).filter((x) => x[1] != null).map((x) => [dnum(x[0]), x[1] / price * 100]);
+  const W = 120, H = 30;
+  if (!pts.length) return `<svg class="spark" width="${W}" height="${H}" aria-hidden="true"></svg>`;
+  const xs = pts.map((p) => p[0]), ys = pts.map((p) => p[1]).concat([actual]);
+  const x0 = Math.min(...xs), x1 = Math.max(...xs) + 1, y0 = Math.min(0, ...ys), y1 = Math.max(1, ...ys);
+  const X = (x) => 3 + (x - x0) / Math.max(1, x1 - x0) * (W - 14), Y = (y) => 4 + (1 - (y - y0) / (y1 - y0)) * (H - 8);
+  return `<svg class="spark" width="${W}" height="${H}" role="img" aria-label="GMP path, then actual listing ${pc(actual, 1)}"><line x1="0" x2="${W}" y1="${Y(0).toFixed(1)}" y2="${Y(0).toFixed(1)}" stroke="var(--line)"/>`
+    + `<path d="${pts.map((p, i) => `${i ? "L" : "M"}${X(p[0]).toFixed(1)} ${Y(p[1]).toFixed(1)}`).join("")}" fill="none" stroke="var(--ink-3)" stroke-width="1.5"/>`
+    + `<circle cx="${W - 5}" cy="${Y(actual).toFixed(1)}" r="3.5" fill="${actual >= 0 ? "var(--good)" : "var(--bad)"}"/></svg>`;
+}
+function scatter(rows) {
+  const pts = rows.filter((r) => r.gEve != null);
+  if (pts.length < 3) return '<div class="empty">Not enough listings yet.</div>';
+  const W = 520, H = 290, L = 42, R = 8, T = 8, Bm = 34;
+  const lo = Math.min(-20, ...pts.map((r) => Math.min(r.gEve, r.gainPct))), hi = Math.max(40, ...pts.map((r) => Math.max(r.gEve, r.gainPct)));
+  const X = (v) => L + (v - lo) / (hi - lo) * (W - L - R), Y = (v) => T + (1 - (v - lo) / (hi - lo)) * (H - T - Bm);
+  const ticks = [...new Set([Math.ceil(lo / 20) * 20, 0, Math.round(hi / 2 / 10) * 10, Math.floor(hi / 10) * 10])];
+  return `<svg viewBox="0 0 ${W} ${H}" width="100%" role="img" aria-label="GMP versus actual listing gain for ${pts.length} IPOs">`
+    + ticks.map((v) => `<line x1="${L}" x2="${W - R}" y1="${Y(v)}" y2="${Y(v)}" stroke="var(--line)"/><text x="${L - 6}" y="${Y(v) + 4}" font-size="10.5" text-anchor="end" fill="var(--ink-3)">${v}%</text><text x="${X(v)}" y="${H - 18}" font-size="10.5" text-anchor="middle" fill="var(--ink-3)">${v}%</text>`).join("")
+    + `<line x1="${X(lo)}" y1="${Y(lo)}" x2="${X(hi)}" y2="${Y(hi)}" stroke="var(--gold)" stroke-dasharray="4 4"/>`
+    + pts.map((r) => `<circle cx="${X(r.gEve).toFixed(1)}" cy="${Y(r.gainPct).toFixed(1)}" r="4.5" fill="${r.segment === "SME" ? "var(--plum)" : "var(--ink)"}" fill-opacity=".7"><title>${esc(r.name)}: GMP ${pc(r.gEve)}, listed ${pc(r.gainPct, 1)}</title></circle>`).join("")
+    + `<text x="${(L + W) / 2}" y="${H - 2}" font-size="11" text-anchor="middle" fill="var(--ink-2)">GMP before listing</text></svg>`
+    + `<div class="note" style="display:flex;gap:16px"><span><svg width="10" height="10" aria-hidden="true"><circle cx="5" cy="5" r="4.5" fill="var(--ink)" fill-opacity=".7"/></svg> Mainboard</span><span><svg width="10" height="10" aria-hidden="true"><circle cx="5" cy="5" r="4.5" fill="var(--plum)" fill-opacity=".7"/></svg> SME</span></div>`;
+}
+function renderRecord(t) {
+  const rows = realRows(t), avg = (a, f) => a.length ? a.reduce((s, x) => s + f(x), 0) / a.length : null;
+  $("recordN").textContent = rows.length ? `${rows.length} listings` : "";
+  $("allLbl").textContent = `Show all ${rows.length} listings`;
+  if (!rows.length) { $("recordAnswer").textContent = "No listings in the last 30 days for this segment."; $("scatter").innerHTML = ""; $("compare").innerHTML = ""; $("real").innerHTML = ""; return; }
+  const withG = rows.filter((r) => r.gEve != null), miss = avg(withG, (r) => Math.abs(r.gEve - r.gainPct));
+  const dir = withG.length ? withG.filter((r) => (r.gEve > 2) === (r.gainPct > 0)).length / withG.length : null;
+  const fantasy = rows.reduce((s, r) => s + r.netAllot, 0), real = rows.reduce((s, r) => s + r.realistic, 0);
+  if ($("accV")) { $("accV").textContent = miss == null ? "—" : "±" + miss.toFixed(0) + " pts"; $("accH").textContent = dir == null ? "" : `direction right ${pr(dir)} of the time`; }
+  $("recordAnswer").innerHTML = `GMP called the direction right <b>${pr(dir)}</b> of the time, but typically missed the size by <b>${miss == null ? "—" : miss.toFixed(0)} points</b>. Applying to every listing would have made <b>${lakh(fantasy)}</b> if you were allotted each time; with real allotment odds it made <b class="${sg(real)}">${inr(real)}</b>.`;
+  $("scatter").innerHTML = scatter(rows);
+  const seg = (s) => { const l = rows.filter((r) => r.segment === s); if (!l.length) return "";
+    const f = l.reduce((a, r) => a + r.netAllot, 0), rl = l.reduce((a, r) => a + r.realistic, 0), exp = l.reduce((a, r) => a + r.odds, 0);
+    return `<div class="seg-row"><div><div class="sname">${s}</div><div class="l">${l.length} IPOs, ${exp.toFixed(1)} allotments expected</div></div>
+      <div><div class="l">If allotted every time</div><div class="v num">${lakh(f)}</div></div><div><div class="l">With real odds</div><div class="v num ${sg(rl)}">${inr(rl)}</div></div></div>`; };
+  $("compare").innerHTML = seg("Mainboard") + seg("SME") + `<p class="note" style="margin:0">The gap is adverse selection: hot IPOs are oversubscribed, so you are rarely allotted in them, while you usually are in weak ones.</p>`;
+  $("real").innerHTML = `<thead><tr><th>IPO</th><th>Listed</th><th style="text-align:left">GMP path, then listing</th><th>GMP at close</th><th>GMP before listing</th><th>Actual</th><th>Retail sub.</th><th>Odds</th><th>If allotted</th><th>Realistic</th></tr></thead><tbody>`
+    + rows.map((r) => `<tr><td>${esc(r.name)} ${r.segment === "SME" ? '<span class="chip sme">SME</span>' : ""}</td><td class="num">${dd(r.listing)}</td><td style="text-align:left">${spark(r.rec, r.price, r.gainPct)}</td>`
+      + `<td class="num">${r.gClose == null ? "—" : pc(r.gClose)}</td><td class="num">${r.gEve == null ? "—" : pc(r.gEve)}</td><td class="num ${sg(r.gainPct)}"><b>${pc(r.gainPct, 1)}</b></td>`
+      + `<td class="num">${r.retail ? r.retail + "x" : r.subClose ? r.subClose + "x" : "—"}</td><td class="num">${r.odds >= 0.995 ? "≈100%" : "1 in " + Math.round(1 / r.odds)}</td>`
+      + `<td class="num ${sg(r.netAllot)}">${inr(r.netAllot)}</td><td class="num ${sg(r.realistic)}"><b>${inr(r.realistic)}</b></td></tr>`).join("") + "</tbody>";
 }
 
 /* ---------- status ---------- */
 function renderStatus() {
   const snap = S.snap || {}, gen = snap.generated_at ? Date.parse(snap.generated_at) : null;
   let txt, dot = "";
-  if (S.live.ok) { txt = "Live · " + ago(Date.now() - S.live.at); dot = "on"; }
-  else if (gen) { txt = "Snapshot · " + ago(Date.now() - gen); dot = S.live.ok === false ? "warn" : ""; }
-  else txt = snap.error ? "Data unavailable" : "Loading…";
+  if (S.live.ok) { txt = "Live · " + ago(Date.now() - S.live.at); dot = "live"; }
+  else if (gen) { txt = "Updated " + ago(Date.now() - gen); dot = S.live.ok === false ? "warn" : ""; }
+  else txt = snap.error ? "Data unavailable" : "Loading";
   $("liveDot").className = "dot " + dot; $("liveTxt").textContent = txt;
   const src = snap.sources || {}, names = { investorgain: "InvestorGain", chittorgarh: "Chittorgarh", ipowatch: "IPO Watch" };
-  $("srcLine").innerHTML = Object.keys(names).filter((k) => src[k]).map((k) => `<span class="${src[k].ok ? "" : "bad"}">${names[k]} ${src[k].ok ? "✓" : "✗"}</span>`).join(" · ")
-    + (S.rows.length ? ` · ${S.rows.length} IPOs of history · ${Object.keys(S.ins).length} analysed` : "");
-  const msgs = [];
-  if (snap.error && !S.snapIpos.length) msgs.push("Couldn't load ipo.json." + (S.live.ok ? " Showing the live InvestorGain feed only." : ""));
-  if (gen && (Date.now() - gen) / 36e5 > STALE_HOURS) msgs.push(`Snapshot unchanged for ${ago(Date.now() - gen).replace(" ago", "")}: check the GitHub Actions run, or it is a quiet period.`);
   const failed = Object.keys(src).filter((k) => src[k].ok === false).map((k) => names[k]);
-  if (failed.length) msgs.push(`Last refresh couldn't reach: ${failed.join(", ")}.`);
-  if (S.live.ok === false) msgs.push("Live feed unreachable from this browser — showing the last snapshot.");
+  $("srcLine").textContent = S.rows.length ? `${S.rows.length} IPOs of history · ${Object.keys(S.ins).length} analysed in depth` : "";
+  const msgs = [];
+  if (snap.error && !S.snapIpos.length) msgs.push("The data snapshot could not be loaded." + (S.live.ok ? " Showing the live feed only." : ""));
+  if (gen && (Date.now() - gen) / 36e5 > STALE_HOURS) msgs.push("The snapshot has not changed for over a day. This is usually a quiet market; otherwise check the GitHub Actions run.");
+  if (failed.length) msgs.push(`The last refresh could not reach ${failed.join(", ")}.`);
   $("banner").innerHTML = msgs.map((m) => `<div class="banner">${esc(m)}</div>`).join("");
-}
-function renderSeg() {
-  const n = (s) => S.ipos.filter((p) => (s === "All" || p.segment === s) && (p.st === "open" || p.st === "upcoming")).length;
-  $("seg").innerHTML = ["All", "Mainboard", "SME"].map((s) => `<button type="button" role="tab" class="${S.seg === s ? "on" : ""}" data-seg="${s}" aria-selected="${S.seg === s}">${s}<span class="c">${n(s)}</span></button>`).join("");
+  $("planN").textContent = S.ipos.filter((p) => S.plan.has(p.id) && p.st !== "listed").length;
 }
 function renderAll() {
   const t = todayIST();
-  renderStatus(); renderHero(t); renderSeg(); renderCalls(t); renderReality(t); renderPlanner(t);
+  renderStatus(); renderToday(t); renderCalls(t); renderRecord(t);
+  if (S.open) { if (S.open.kind === "plan") drawerPlan(); else { const p = S.ipos.find((x) => x.id === S.open.id && x.call); p ? drawerIPO(p) : closeDrawer(); } }
 }
 
 /* ---------- events ---------- */
-document.addEventListener("click", (e) => { const s = e.target.closest("[data-seg]"); if (s) { S.seg = s.dataset.seg; save(); renderAll(); } });
-document.addEventListener("change", (e) => {
-  const id = e.target.dataset && e.target.dataset.plan;
-  if (id == null) return;
-  e.target.checked ? S.plan.add(id) : S.plan.delete(id);
-  save(); renderPlanner(todayIST());
+document.addEventListener("click", (e) => {
+  const o = e.target.closest("[data-open]"); if (o) return openDrawer("ipo", o.dataset.open);
+  if (e.target.closest("[data-close]")) return closeDrawer();
+  const pl = e.target.closest("[data-plan]");
+  if (pl) { const id = pl.dataset.plan; S.plan.has(id) ? S.plan.delete(id) : S.plan.add(id); save(); renderAll(); return; }
+  const s = e.target.closest("[data-seg]"); if (s) { S.seg = s.dataset.seg; save(); renderAll(); }
 });
+$("planBtn").addEventListener("click", () => openDrawer("plan"));
+document.addEventListener("keydown", (e) => {
+  if (!S.open) return;
+  if (e.key === "Escape") return closeDrawer();
+  if (e.key === "Tab") { const f = [...document.querySelectorAll(".drawer button, .drawer a[href]")]; if (!f.length) return;
+    if (e.shiftKey && document.activeElement === f[0]) { e.preventDefault(); f[f.length - 1].focus(); }
+    else if (!e.shiftKey && document.activeElement === f[f.length - 1]) { e.preventDefault(); f[0].focus(); } }
+});
+const io = new IntersectionObserver((es) => es.forEach((en) => { if (en.isIntersecting) document.querySelectorAll("[data-nav]").forEach((a) => a.classList.toggle("on", a.dataset.nav === en.target.id)); }), { rootMargin: "-40% 0px -55% 0px" });
+["today", "calls", "record"].forEach((id) => io.observe($(id)));
+
 let busy = false;
 async function refresh(both = true) {
   if (busy) return; busy = true; $("refreshBtn").setAttribute("aria-busy", "true");
@@ -577,7 +521,11 @@ setInterval(() => {
   else renderStatus();
 }, 30e3);
 document.addEventListener("visibilitychange", () => { if (document.visibilityState === "visible" && Date.now() - lastLive > 60e3) { lastSnap = lastLive = Date.now(); refresh(true); } });
-(async () => { await loadStatic(); await refresh(true); })();
+(async () => {
+  await loadStatic(); await refresh(true);
+  const h = decodeURIComponent(location.hash);
+  if (h.startsWith("#ipo=")) openDrawer("ipo", h.slice(5)); else if (h === "#plan") openDrawer("plan");
+})();
 </script>
 </body>
 </html>
