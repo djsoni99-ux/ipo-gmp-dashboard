@@ -10,10 +10,10 @@
 <style>
 :root{--bg:#F7F5F0;--surface:#fff;--alt:#F0EDE4;--line:#E1DCCE;--ink:#211E17;--ink2:#5C5646;--ink3:#8A836D;
   --accent:#B5651D;--accent-ink:#7A4212;--accent-soft:#F1E1CB;--good:#1E8E5A;--good-soft:#DCF3E7;--bad:#B3261E;--bad-soft:#F8DEDC;
-  --warn:#9A5B00;--warn-soft:#FBEDD3;--shadow:0 1px 2px rgba(33,30,23,.06),0 6px 20px -12px rgba(33,30,23,.25)}
+  --warn:#9A5B00;--warn-soft:#FBEDD3;--sme:#6B4FA0;--shadow:0 1px 2px rgba(33,30,23,.06),0 6px 20px -12px rgba(33,30,23,.25)}
 @media (prefers-color-scheme:dark){:root{--bg:#17150F;--surface:#1F1C15;--alt:#272319;--line:#38321F;--ink:#F3EFE4;--ink2:#C7C0AC;--ink3:#9A9279;
   --accent:#E0913E;--accent-ink:#F6C387;--accent-soft:#3A2A15;--good:#4ADE80;--good-soft:#173423;--bad:#F2857D;--bad-soft:#3A1E1B;
-  --warn:#E3B34A;--warn-soft:#3A2C10;--shadow:0 1px 2px rgba(0,0,0,.3),0 6px 20px -12px rgba(0,0,0,.6)}}
+  --warn:#E3B34A;--warn-soft:#3A2C10;--sme:#B7A0F0;--shadow:0 1px 2px rgba(0,0,0,.3),0 6px 20px -12px rgba(0,0,0,.6)}}
 *{box-sizing:border-box}html,body{margin:0}
 body{background:var(--bg);color:var(--ink);font:15px/1.5 "Public Sans",ui-sans-serif,system-ui,sans-serif;-webkit-font-smoothing:antialiased}
 .num{font-family:"IBM Plex Mono",ui-monospace,Menlo,monospace;font-variant-numeric:tabular-nums}
@@ -22,18 +22,29 @@ a{color:var(--accent-ink)}
 .wrap{max-width:1180px;margin:0 auto;padding:28px 20px 64px}
 .eyebrow{font-size:12px;letter-spacing:.09em;text-transform:uppercase;color:var(--accent-ink);font-weight:700}
 h1{font:800 clamp(26px,3.4vw,34px)/1.15 Archivo,system-ui,sans-serif;margin:4px 0 6px}
-h2{font:700 15px/1.3 Archivo,system-ui,sans-serif;margin:0 0 10px;text-transform:uppercase;letter-spacing:.05em}
+h2{font:700 14px/1.3 Archivo,system-ui,sans-serif;margin:0 0 10px;text-transform:uppercase;letter-spacing:.05em}
 .sub{font-size:12.5px;color:var(--ink3)}
+.lede{color:var(--ink2);max-width:75ch;margin:6px 0 0}
 .panel{background:var(--surface);border:1px solid var(--line);border-radius:14px;box-shadow:var(--shadow);padding:16px 18px;margin-bottom:16px}
 .banner{background:var(--warn-soft);color:var(--warn);border:1px solid var(--line);border-radius:12px;padding:10px 14px;font-size:13.5px;margin-bottom:14px}
 .grid{display:grid;gap:12px}
 .tiles{grid-template-columns:repeat(4,1fr)}
-@media(max-width:860px){.tiles{grid-template-columns:repeat(2,1fr)}}
+.two{grid-template-columns:1fr 1fr}
+@media(max-width:860px){.tiles{grid-template-columns:repeat(2,1fr)}.two{grid-template-columns:1fr}}
 .tile{background:var(--surface);border:1px solid var(--line);border-radius:14px;padding:13px 15px;box-shadow:var(--shadow);min-width:0}
 .tile .l{font-size:11.5px;color:var(--ink3);text-transform:uppercase;letter-spacing:.06em;font-weight:600}
 .tile .v{font:800 23px/1.25 Archivo,sans-serif}
 .tile .h{font-size:12.5px;color:var(--ink2)}
 .good{color:var(--good)}.bad{color:var(--bad)}
+.tabs{display:inline-flex;background:var(--alt);border:1px solid var(--line);border-radius:12px;padding:4px;gap:4px;margin:16px 0 14px}
+.tabs button{border:0;background:transparent;color:var(--ink2);font:inherit;font-weight:700;font-size:14px;padding:8px 18px;border-radius:9px;cursor:pointer}
+.tabs button.on{background:var(--surface);color:var(--accent-ink);box-shadow:var(--shadow)}
+.tabs button .c{font-weight:500;opacity:.65;margin-left:6px;font-size:12px}
+.seg-card{border-top:4px solid var(--accent)}
+.seg-card.sme{border-top-color:var(--sme)}
+.seg-card h3{margin:0 0 8px;font:800 18px Archivo,sans-serif}
+.kv{display:grid;grid-template-columns:1fr auto;gap:3px 12px;font-size:13px;margin:0}
+.kv dt{color:var(--ink3)}.kv dd{margin:0;text-align:right}
 details>summary{cursor:pointer;font-weight:700;font-family:Archivo,sans-serif;text-transform:uppercase;letter-spacing:.05em;font-size:14px}
 .form{display:grid;grid-template-columns:repeat(auto-fill,minmax(150px,1fr));gap:10px 14px;margin-top:12px}
 .form label{display:flex;flex-direction:column;font-size:12px;color:var(--ink3);gap:3px;font-weight:600}
@@ -41,6 +52,7 @@ details>summary{cursor:pointer;font-weight:700;font-family:Archivo,sans-serif;te
 .form .chk{flex-direction:row;align-items:center;gap:8px;color:var(--ink2)}
 .form .chk input{width:auto}
 .scroll{overflow-x:auto}
+.grid>*,.panel{min-width:0}
 table{border-collapse:collapse;width:100%;font-size:13px}
 th{font-size:11px;text-transform:uppercase;letter-spacing:.05em;color:var(--ink3);text-align:right;padding:8px 10px;background:var(--alt);white-space:nowrap}
 td{padding:8px 10px;border-top:1px solid var(--line);text-align:right;white-space:nowrap}
@@ -49,44 +61,60 @@ tbody tr.sel{background:var(--accent-soft)}
 tbody tr[data-i]{cursor:pointer}
 tbody tr[data-i]:hover{background:var(--alt)}
 .btn{border:1px solid var(--line);background:var(--surface);color:var(--ink);border-radius:100px;padding:6px 14px;font:inherit;font-size:12.5px;font-weight:600;cursor:pointer}
-.two{grid-template-columns:1fr 1fr}
-@media(max-width:860px){.two{grid-template-columns:1fr}}
 svg{width:100%;height:auto;display:block}
-.barrow{display:grid;grid-template-columns:70px 1fr 56px;gap:8px;align-items:center;font-size:12.5px;margin:5px 0}
-.bar{height:8px;border-radius:4px;background:var(--alt);position:relative;margin:2px 0}
-.bar i{position:absolute;left:0;top:0;bottom:0;border-radius:4px}
+.brow{display:grid;grid-template-columns:96px 1fr 128px;gap:10px;align-items:center;font-size:12.5px;margin:6px 0}
+.bar{height:10px;border-radius:5px;background:var(--alt);position:relative;overflow:hidden}
+.bar i{position:absolute;left:0;top:0;bottom:0;border-radius:5px}
+.bar.mid i{left:50%}
+.bar.mid::after{content:"";position:absolute;left:50%;top:0;bottom:0;width:1px;background:var(--ink3)}
+.thin{opacity:.5}
 .notes li{margin:4px 0;color:var(--ink2);font-size:13px}
 </style>
 </head>
 <body>
 <div class="wrap">
   <header>
-    <span class="eyebrow">What if I had applied to every IPO?</span>
+    <span class="eyebrow">Applied &rarr; sold on listing day</span>
     <h1>IPO GMP Backtest</h1>
-    <div class="sub"><a href="./">&larr; Live dashboard</a> &middot; <span id="coverage">Loading&hellip;</span></div>
+    <p class="lede">Each row assumes you applied at the issue price and, if allotted, sold on listing day at the listing price (less slippage and charges). Nothing is held. SME and mainboard are tested separately because they behave very differently.</p>
+    <div class="sub" style="margin-top:6px"><a href="./">&larr; Live dashboard</a> &middot; <span id="coverage">Loading&hellip;</span></div>
   </header>
-  <div id="banner" style="margin-top:14px"></div>
+  <div class="tabs" id="tabs" role="tablist" aria-label="Segment"></div>
+  <div id="banner"></div>
 
-  <details class="panel" open>
+  <section class="grid two" id="scoreboard" style="margin-bottom:16px"></section>
+
+  <details class="panel">
     <summary>Assumptions</summary>
     <div class="form" id="form"></div>
-    <div class="sub" style="margin-top:10px">Everything recalculates instantly in your browser. Rates are defaults as of writing &mdash; verify tax and charges before relying on the rupee figures.</div>
+    <div class="sub" style="margin-top:10px">Everything recalculates instantly in your browser. Rates are defaults as of writing &mdash; verify tax and charges before relying on rupee figures.</div>
   </details>
 
   <section class="panel">
-    <h2>Strategies</h2>
+    <h2 id="stratTitle">Strategies</h2>
     <div class="form" id="custom" style="margin:0 0 12px"></div>
     <div class="scroll"><table id="cmp"></table></div>
-    <div class="sub" style="margin-top:8px">Click a row to see it in detail. &ldquo;Expected&rdquo; = probability-weighted over the allotment lottery; P10&ndash;P90 comes from seeded Monte Carlo draws.</div>
+    <div class="sub" style="margin-top:8px">Click a row for detail. &ldquo;Expected&rdquo; is probability-weighted over the allotment lottery; P10&ndash;P90 is seeded Monte Carlo. &ldquo;GMP at close&rdquo; is point-in-time but exists for fewer IPOs; &ldquo;first GMP&rdquo; is the earliest quote, known before bidding, and exists for nearly all.</div>
   </section>
 
   <section id="detail"></section>
+
+  <section class="grid two">
+    <div class="panel"><h2>Listing gain distribution</h2><div id="dist"></div></div>
+    <div class="panel"><h2>Market tape &mdash; average listing gain by month</h2><div id="tape"></div></div>
+  </section>
+
+  <section class="panel">
+    <h2>What actually moved the listing gain</h2>
+    <div class="sub" style="margin-bottom:8px">Descriptive, one factor at a time, for the selected segment. Bars show average listing gain; right column shows n, % listed positive and median.</div>
+    <div class="grid two" id="factors"></div>
+  </section>
 
   <section class="panel">
     <h2>How good was GMP as a predictor?</h2>
     <label class="sub">Signal: <select id="calMode" style="font:inherit;background:var(--bg);color:var(--ink);border:1px solid var(--line);border-radius:8px;padding:4px 6px">
       <option value="list">Listing-eve GMP (widest coverage, not tradable)</option>
-      <option value="close">Close-day GMP (decision-time, recent IPOs only)</option></select></label>
+      <option value="close">Close-day GMP (decision-time, fewer IPOs)</option></select></label>
     <div id="cal" style="margin-top:10px"></div>
   </section>
 
@@ -99,11 +127,11 @@ svg{width:100%;height:auto;display:block}
   <section class="panel notes">
     <h2>Read this before trusting the numbers</h2>
     <ul>
-      <li><b>Window:</b> a rolling 13 months of listed IPOs, so the sample is a few hundred, not thousands. Results from one market phase may not repeat in another.</li>
-      <li><b>Point-in-time:</b> GMP filters use only the closing-day GMP. Older pages are paywalled to the last 3 readings, so they have no close-day GMP and appear only in the &ldquo;apply to all&rdquo; style strategies.</li>
-      <li><b>Allotment is a lottery, and the biggest unknown:</b> without per-IPO subscription the odds are your assumption above, and net P&amp;L scales linearly with it. Hot IPOs are the hardest to get, so a flat probability <i>overstates</i> the value of high-GMP filters. &ldquo;Net / allotment&rdquo; does not depend on the odds, so compare strategies on that first. Where final subscription is known the odds use 1/subscription (total, not retail &mdash; an approximation).</li>
-      <li><b>Exit at listing price</b> less slippage is optimistic for SME IPOs (circuits, thin liquidity). Charges and tax are simplified (no holiday calendar, no loss carry-forward).</li>
-      <li><b>Survivorship:</b> only IPOs that listed are included. GMP is unofficial and noisy, especially for SME. Small samples are shown with their N; do not over-read them.</li>
+      <li><b>Window:</b> a rolling 13 months of listed IPOs. One market phase may not repeat in another, and per-segment samples are a few hundred at most.</li>
+      <li><b>Point-in-time:</b> &ldquo;GMP at close&rdquo; and &ldquo;first GMP&rdquo; are known before bidding ends. Final subscription is known only as bidding closes (a mild look-ahead if you decide earlier). Listing-eve GMP is shown for calibration only.</li>
+      <li><b>Adverse selection is the main finding:</b> allotment odds use 1/final subscription (total, not retail &mdash; an approximation), capped at 100%. You are most likely to be allotted in the weakest IPOs, and the hottest ones have odds near 1%. So the simple average listing gain flatters; &ldquo;Gain you&rsquo;d get&rdquo; (odds-weighted) and expected net P&amp;L are the honest numbers.</li>
+      <li><b>SME exits are optimistic:</b> circuits, thin order books and market-maker quotes can stop you selling at the listing price; the default slippage is higher for SME but still a guess.</li>
+      <li><b>Survivorship &amp; data:</b> only IPOs that listed are included. GMP is unofficial and noisy. Charges and tax are simplified (no holiday calendar, no loss carry-forward).</li>
     </ul>
   </section>
 </div>
@@ -116,67 +144,107 @@ const $ = (id) => document.getElementById(id);
 const esc = (s) => String(s ?? "").replace(/[&<>"']/g, (c) => ({ "&": "&amp;", "<": "&lt;", ">": "&gt;", '"': "&quot;", "'": "&#39;" }[c]));
 const inr = (n) => n == null || isNaN(n) ? "—" : (n < 0 ? "-" : "") + "₹" + Math.abs(Math.round(n)).toLocaleString("en-IN");
 const pc = (n, d = 1) => n == null || isNaN(n) ? "—" : (n > 0 ? "+" : "") + n.toFixed(d) + "%";
+const pr = (x) => x == null ? "—" : (x * 100).toFixed(0) + "%";
 const cls = (n) => n > 0 ? "good" : n < 0 ? "bad" : "";
 const dn = (s) => Date.UTC(+s.slice(0, 4), +s.slice(5, 7) - 1, +s.slice(8, 10)) / 864e5;
 
-const U = { ticketM: 15000, ticketS: 120000, accounts: 1, pM: 25, pS: 8, useSub: true, allowPost: false,
-  slip: 0.5, brokerage: 20, applyTax: true, tax: 20.8, bench: 6.5, from: "", to: "" };
+const U = { ticketM: 15000, ticketS: 120000, accounts: 1, slipM: 0.5, slipS: 2, brokerage: 20, applyTax: true, tax: 20.8,
+  bench: 6.5, useSub: true, pM: 25, pS: 8, from: "", to: "" };
 const FIELDS = [["ticketM", "Mainboard ticket ₹"], ["ticketS", "SME ticket ₹"], ["accounts", "Accounts (PANs)"],
-  ["pM", "P(allot) mainboard %"], ["pS", "P(allot) SME %"], ["slip", "Exit slippage %"], ["brokerage", "Brokerage ₹/sale"],
-  ["tax", "Tax rate %"], ["bench", "Benchmark %/yr"], ["from", "From (bid date)", "date"], ["to", "To (bid date)", "date"]];
-const CHECKS = [["useSub", "Use 1/subscription where known"], ["allowPost", "Allow T+1 GMP (not tradable)"], ["applyTax", "Apply tax"]];
-try { Object.assign(U, JSON.parse(localStorage.getItem("ipo-bt-prefs") || "{}")); } catch (e) {}
+  ["slipM", "Mainboard exit slippage %"], ["slipS", "SME exit slippage %"], ["brokerage", "Brokerage ₹/sale"],
+  ["tax", "Tax rate %"], ["bench", "Benchmark %/yr"], ["pM", "P(allot) if sub unknown, Main %"], ["pS", "P(allot) if sub unknown, SME %"],
+  ["from", "From (bid date)", "date"], ["to", "To (bid date)", "date"]];
+const CHECKS = [["useSub", "Allotment odds = 1/final subscription"], ["applyTax", "Apply tax"]];
+try { Object.assign(U, JSON.parse(localStorage.getItem("ipo-bt-prefs2") || "{}")); } catch (e) {}
 
-let RECORDS = [], ROWS = [], SEL = 0, RESULTS = [];
-const custom = { name: "Custom", segment: "All", minGmpPct: "", minSub: "", minSize: "" };
+const SEG_LABEL = { SME: "SME", Mainboard: "Mainboard (non-SME)", All: "Combined" };
+const PRESETS = {
+  SME: [["Apply to all", {}], ["First GMP > 0", { minFirstGmpPct: 0.01 }], ["First GMP ≥ 10%", { minFirstGmpPct: 10 }], ["First GMP ≥ 20%", { minFirstGmpPct: 20 }],
+    ["GMP at close ≥ 10%", { minGmpPct: 10 }], ["GMP at close ≥ 20%", { minGmpPct: 20 }], ["Final sub ≥ 20x", { minSub: 20 }], ["Final sub ≥ 100x", { minSub: 100 }]],
+  Mainboard: [["Apply to all", {}], ["First GMP > 0", { minFirstGmpPct: 0.01 }], ["First GMP ≥ 10%", { minFirstGmpPct: 10 }], ["First GMP ≥ 20%", { minFirstGmpPct: 20 }],
+    ["GMP at close ≥ 10%", { minGmpPct: 10 }], ["GMP at close ≥ 20%", { minGmpPct: 20 }], ["Final sub ≥ 5x", { minSub: 5 }], ["Issue ≥ ₹500 Cr", { minSize: 500 }]],
+  All: [["Apply to all", {}], ["First GMP ≥ 10%", { minFirstGmpPct: 10 }], ["First GMP ≥ 20%", { minFirstGmpPct: 20 }], ["GMP at close ≥ 10%", { minGmpPct: 10 }], ["Final sub ≥ 10x", { minSub: 10 }]],
+};
+const custom = { minFirstGmpPct: "", minGmpPct: "", minSub: "", minSize: "", minRating: "" };
+
+let RECORDS = [], ROWS = [], TAB = "SME", SEL = 0, RESULTS = [], STRATS = [];
+try { TAB = localStorage.getItem("ipo-bt-tab") || "SME"; } catch (e) {}
 
 const toCfg = () => ({
   ticket: { Mainboard: +U.ticketM || 15000, SME: +U.ticketS || 120000 }, accounts: Math.max(1, +U.accounts || 1),
-  allot: { Mainboard: (+U.pM || 0) / 100, SME: (+U.pS || 0) / 100 }, useSub: U.useSub, allowPost: U.allowPost,
-  slippagePct: +U.slip || 0, brokerage: +U.brokerage || 0, applyTax: U.applyTax, taxPct: +U.tax || 0, benchmarkPct: +U.bench || 0,
-  mcRuns: 2000, seed: 42,
+  allot: { Mainboard: (+U.pM || 0) / 100, SME: (+U.pS || 0) / 100 }, useSub: U.useSub, allowPost: false,
+  slippagePct: { Mainboard: +U.slipM || 0, SME: +U.slipS || 0 }, brokerage: +U.brokerage || 0,
+  applyTax: U.applyTax, taxPct: +U.tax || 0, benchmarkPct: +U.bench || 0, mcRuns: 2000, seed: 42,
 });
-const strategies = () => {
-  const range = (s) => Object.assign({}, s, U.from ? { from: U.from } : {}, U.to ? { to: U.to } : {});
-  const c = { name: "Custom", segment: custom.segment };
-  if (custom.minGmpPct !== "") c.minGmpPct = +custom.minGmpPct;
-  if (custom.minSub !== "") c.minSub = +custom.minSub;
-  if (custom.minSize !== "") c.minSize = +custom.minSize;
-  return B.PRESETS.map(range).concat([range(c)]);
-};
+const tabRows = () => ROWS.filter((r) => TAB === "All" || r.segment === TAB);
+function strategies() {
+  const range = (s) => Object.assign({ segment: TAB }, s, U.from ? { from: U.from } : {}, U.to ? { to: U.to } : {});
+  const list = PRESETS[TAB].map(([name, f]) => Object.assign({ name }, range(f)));
+  const c = { name: "Custom" };
+  for (const k of Object.keys(custom)) if (custom[k] !== "") c[k] = +custom[k];
+  return list.concat([Object.assign(c, range({}))]);
+}
 
-function renderForm() {
+function renderStatic() {
   $("form").innerHTML = FIELDS.map(([k, l, t]) => `<label>${l}<input data-k="${k}" type="${t || "number"}" value="${esc(U[k])}" step="any"></label>`).join("")
     + CHECKS.map(([k, l]) => `<label class="chk"><input data-c="${k}" type="checkbox" ${U[k] ? "checked" : ""}>${l}</label>`).join("");
-  $("custom").innerHTML = `<label>Custom: segment<select data-x="segment">${["All", "Mainboard", "SME"].map((s) => `<option ${custom.segment === s ? "selected" : ""}>${s}</option>`).join("")}</select></label>`
-    + [["minGmpPct", "Min GMP % at close"], ["minSub", "Min subscription x at close"], ["minSize", "Min issue size ₹ Cr"]]
-      .map(([k, l]) => `<label>${l}<input data-x="${k}" type="number" step="any" value="${esc(custom[k])}" placeholder="any"></label>`).join("");
+  $("custom").innerHTML = [["minFirstGmpPct", "Min first GMP %"], ["minGmpPct", "Min GMP % at close"], ["minSub", "Min final subscription x"],
+    ["minSize", "Min issue size ₹ Cr"], ["minRating", "Min rating (1-5)"]]
+    .map(([k, l]) => `<label>Custom: ${l}<input data-x="${k}" type="number" step="any" value="${esc(custom[k])}" placeholder="any"></label>`).join("");
 }
 
 function compute() {
   const cfg = toCfg();
   ROWS = B.ledger(RECORDS, cfg);
-  RESULTS = strategies().map((s) => B.run(ROWS, s, cfg));
+  STRATS = strategies();
+  RESULTS = STRATS.map((s) => B.run(ROWS, s, cfg));
+  SEL = Math.min(SEL, RESULTS.length - 1);
   render(cfg);
 }
 
+function renderTabs() {
+  const n = (s) => ROWS.filter((r) => s === "All" || r.segment === s).length;
+  $("tabs").innerHTML = ["SME", "Mainboard", "All"].map((s) => `<button type="button" role="tab" class="${TAB === s ? "on" : ""}" data-tab="${s}" aria-selected="${TAB === s}">${SEG_LABEL[s]}<span class="c">${n(s)}</span></button>`).join("");
+}
+
+function scoreboard(cfg) {
+  const card = (seg) => {
+    const rows = ROWS.filter((r) => r.segment === seg), r = B.run(rows, { segment: seg }, Object.assign({}, cfg, { mcRuns: 0 }));
+    if (r.empty) return `<div class="panel seg-card ${seg === "SME" ? "sme" : ""}"><h3>${SEG_LABEL[seg]}</h3><div class="sub">No IPOs.</div></div>`;
+    const st = B.stats(rows);
+    return `<div class="panel seg-card ${seg === "SME" ? "sme" : ""}"><h3>${SEG_LABEL[seg]} &mdash; apply to all</h3><dl class="kv num">`
+      + `<dt>IPOs</dt><dd>${r.n}</dd><dt>Avg / median listing gain</dt><dd>${pc(st.avgGain)} / ${pc(st.medianGain)}</dd>`
+      + `<dt>Listed positive</dt><dd>${pr(st.posRate)}</dd><dt>Listed ≤ -10%</dt><dd class="bad">${pr(r.deepLossRate)}</dd>`
+      + `<dt>Avg allotment odds</dt><dd>${pr(r.allotRate)}</dd><dt>Gain on shares you'd actually get</dt><dd class="${cls(r.weightedGainPct)}">${pc(r.weightedGainPct)}</dd>`
+      + `<dt>Expected net P&amp;L</dt><dd class="${cls(r.net)}">${inr(r.net)}</dd><dt>Avg days capital blocked</dt><dd>${r.avgBlockedDays.toFixed(1)} d</dd></dl></div>`;
+  };
+  $("scoreboard").innerHTML = card("SME") + card("Mainboard");
+}
+
 function render(cfg) {
-  const withSig = ROWS.filter((r) => r.sigKind).length;
-  $("banner").innerHTML = ROWS.length && withSig < ROWS.length * 0.5
-    ? `<div class="banner">Only ${withSig} of ${ROWS.length} listed IPOs have a decision-time (close-day) GMP, because older pages are paywalled. GMP strategies use that smaller sample; &ldquo;apply to all&rdquo; uses all ${ROWS.length}. The set grows by about 40 IPOs a month.</div>` : "";
-  const dates = ROWS.map((r) => r.listing);
-  $("coverage").textContent = `${RECORDS.length} IPOs archived · ${ROWS.length} with listing result · ${withSig} with close-day GMP`
+  renderTabs();
+  const tr = tabRows();
+  const withSig = tr.filter((r) => r.sigKind).length;
+  $("banner").innerHTML = tr.length && withSig < tr.length * 0.5
+    ? `<div class="banner">Only ${withSig} of ${tr.length} ${SEG_LABEL[TAB]} IPOs have a decision-time GMP at close (older pages are paywalled). Use the <b>first GMP</b> and <b>final subscription</b> strategies for larger samples; the close-day GMP sample grows by about 40 IPOs a month.</div>` : "";
+  const dates = ROWS.map((r) => r.listing).sort();
+  $("coverage").textContent = `${RECORDS.length} IPOs archived · ${ROWS.length} with listing result · ${ROWS.filter((r) => r.sigKind).length} with close-day GMP`
     + (dates.length ? ` · ${dates[0]} → ${dates[dates.length - 1]}` : "");
-  const head = ["Strategy", "IPOs", "Allot %", "Net P&L", "Net / allotment", "Avg gain", "Win %", "Days blocked", "Peak capital", "Ann. return", "P10 – P90", "P(loss)"];
+  scoreboard(cfg);
+  $("stratTitle").textContent = SEG_LABEL[TAB] + " strategies";
+  const head = ["Strategy", "IPOs", "Allot %", "Net P&L", "Avg gain", "Gain you'd get", "Win %", "Loss ≤-10%", "Days blocked", "Peak capital", "Ann. return", "P10 – P90", "P(loss)"];
   $("cmp").innerHTML = `<thead><tr>${head.map((h) => `<th>${h}</th>`).join("")}</tr></thead><tbody>` + RESULTS.map((r, i) => {
     const n = esc(r.strat.name);
-    if (r.empty) return `<tr data-i="${i}" class="${i === SEL ? "sel" : ""}"><td>${n}</td><td class="num">0</td><td colspan="10" class="sub" style="text-align:left">no IPOs match</td></tr>`;
-    return `<tr data-i="${i}" class="${i === SEL ? "sel" : ""} num"><td style="font-family:inherit">${n}</td><td>${r.n}</td><td>${(r.allotRate * 100).toFixed(0)}%</td>`
-      + `<td class="${cls(r.net)}">${inr(r.net)}</td><td class="${cls(r.avgNetPerAllotment)}">${inr(r.avgNetPerAllotment)}</td><td>${pc(r.avgGainPct)}</td>`
-      + `<td>${(r.winRate * 100).toFixed(0)}%</td><td>${r.avgBlockedDays.toFixed(1)} d</td><td>${inr(r.peakCapital)}</td><td class="${cls(r.annReturnPct)}">${pc(r.annReturnPct, 0)}</td>`
-      + `<td>${r.mc ? inr(r.mc.p10) + " – " + inr(r.mc.p90) : "—"}</td><td>${r.mc ? (r.mc.pLoss * 100).toFixed(0) + "%" : "—"}</td></tr>`;
+    if (r.empty) return `<tr data-i="${i}" class="${i === SEL ? "sel" : ""}"><td>${n}</td><td class="num">0</td><td colspan="12" class="sub" style="text-align:left">no IPOs match</td></tr>`;
+    const thin = r.n < 15 ? ' title="small sample"' : "";
+    return `<tr data-i="${i}" class="${i === SEL ? "sel" : ""} num"><td style="font-family:inherit">${n}</td><td${thin} class="${r.n < 15 ? "thin" : ""}">${r.n}${r.n < 15 ? "*" : ""}</td><td>${pr(r.allotRate)}</td>`
+      + `<td class="${cls(r.net)}">${inr(r.net)}</td><td>${pc(r.avgGainPct)}</td><td class="${cls(r.weightedGainPct)}">${pc(r.weightedGainPct)}</td>`
+      + `<td>${pr(r.winRate)}</td><td>${pr(r.deepLossRate)}</td><td>${r.avgBlockedDays.toFixed(1)} d</td><td>${inr(r.peakCapital)}</td><td class="${cls(r.annReturnPct)}">${pc(r.annReturnPct, 0)}</td>`
+      + `<td>${r.mc ? inr(r.mc.p10) + " – " + inr(r.mc.p90) : "—"}</td><td>${r.mc ? pr(r.mc.pLoss) : "—"}</td></tr>`;
   }).join("") + "</tbody>";
   renderDetail(cfg);
+  renderDist();
+  renderFactors();
   renderCal();
   renderLedger();
 }
@@ -190,9 +258,8 @@ function lineChart(pts, opt = {}) {
   if (y1 === y0) y1 = y0 + 1;
   const X = (x) => L + (x - x0) / Math.max(1, x1 - x0) * (W - L - R), Y = (y) => T + (1 - (y - y0) / (y1 - y0)) * (H - T - Bm);
   const d = pts.map((p, i) => `${i ? "L" : "M"}${X(dn(p[0])).toFixed(1)} ${Y(p[1]).toFixed(1)}`).join("");
-  const ticks = [y0, (y0 + y1) / 2, y1];
   return `<svg viewBox="0 0 ${W} ${H}" role="img" aria-label="${esc(opt.label || "chart")}">`
-    + ticks.map((t) => `<line x1="${L}" x2="${W - R}" y1="${Y(t).toFixed(1)}" y2="${Y(t).toFixed(1)}" stroke="var(--line)"/><text x="${L - 6}" y="${(Y(t) + 4).toFixed(1)}" text-anchor="end" font-size="10" fill="var(--ink3)">${inr(t)}</text>`).join("")
+    + [y0, (y0 + y1) / 2, y1].map((t) => `<line x1="${L}" x2="${W - R}" y1="${Y(t).toFixed(1)}" y2="${Y(t).toFixed(1)}" stroke="var(--line)"/><text x="${L - 6}" y="${(Y(t) + 4).toFixed(1)}" text-anchor="end" font-size="10" fill="var(--ink3)">${inr(t)}</text>`).join("")
     + (opt.area ? `<path d="${d}L${X(x1).toFixed(1)} ${Y(0).toFixed(1)}L${X(x0).toFixed(1)} ${Y(0).toFixed(1)}Z" fill="var(--accent-soft)"/>` : "")
     + `<path d="${d}" fill="none" stroke="var(--accent)" stroke-width="2" stroke-linejoin="round"/>`
     + `<text x="${L}" y="${H - 6}" font-size="10" fill="var(--ink3)">${pts[0][0]}</text><text x="${W - R}" y="${H - 6}" text-anchor="end" font-size="10" fill="var(--ink3)">${pts[pts.length - 1][0]}</text></svg>`;
@@ -203,64 +270,90 @@ function renderDetail(cfg) {
   if (!r || r.empty) { $("detail").innerHTML = ""; return; }
   const t = (l, v, h, c) => `<div class="tile"><div class="l">${l}</div><div class="v num ${c || ""}">${v}</div><div class="h">${h}</div></div>`;
   const excess = r.net - r.benchmarkPnl;
-  $("detail").innerHTML = `<h2 style="margin:18px 0 10px">${esc(r.strat.name)} &mdash; detail</h2><div class="grid tiles" style="margin-bottom:12px">`
+  $("detail").innerHTML = `<h2 style="margin:18px 0 10px">${esc(SEG_LABEL[TAB])} &middot; ${esc(r.strat.name)}</h2><div class="grid tiles" style="margin-bottom:12px">`
     + t("Net P&L (expected)", inr(r.net), `gross ${inr(r.gross)} · charges ${inr(r.charges)} · tax ${inr(r.tax)}`, cls(r.net))
-    + t("Applications", r.applications, `${r.expAllotments.toFixed(1)} expected allotments (${(r.allotRate * 100).toFixed(0)}%)`)
+    + t("Applications", r.applications, `${r.expAllotments.toFixed(1)} expected allotments (${pr(r.allotRate)})`)
     + t("Avg days blocked", r.avgBlockedDays.toFixed(1) + " d", `refunded ${r.avgDaysRefund.toFixed(0)} d · allotted ${r.avgDaysAllot.toFixed(0)} d`)
-    + t("Peak capital", inr(r.peakCapital), `avg ${inr(r.avgCapital)} · locked ${(r.utilisation * 100).toFixed(0)}% of days`)
+    + t("Peak capital", inr(r.peakCapital), `avg ${inr(r.avgCapital)} · locked ${pr(r.utilisation)} of days`)
     + t("Return on blocked capital", pc(r.annReturnPct, 0) + " p.a.", `benchmark ${cfg.benchmarkPct}% · excess ${inr(excess)}`, cls(excess))
-    + t("Avg listing gain", pc(r.avgGainPct), `median ${pc(r.medianGainPct)} · best ${pc(r.bestGainPct, 0)} · worst ${pc(r.worstGainPct, 0)}`)
-    + t("Win rate (per allotment)", (r.winRate * 100).toFixed(0) + "%", `net after charges · ${r.n} IPOs`)
-    + t("Lottery spread", r.mc ? inr(r.mc.p10) + " … " + inr(r.mc.p90) : "—", r.mc ? `median ${inr(r.mc.p50)} · P(loss) ${(r.mc.pLoss * 100).toFixed(0)}% · max drawdown ${inr(r.maxDrawdown)}` : "")
+    + t("Gain you'd actually get", pc(r.weightedGainPct), `simple avg ${pc(r.avgGainPct)} · median ${pc(r.medianGainPct)} · best ${pc(r.bestGainPct, 0)} · worst ${pc(r.worstGainPct, 0)}`, cls(r.weightedGainPct))
+    + t("Win rate (per allotment)", pr(r.winRate), `listed ≤ -10%: ${pr(r.deepLossRate)} · ≥ +25%: ${pr(r.bigWinRate)}`)
+    + t("Lottery spread", r.mc ? inr(r.mc.p10) + " … " + inr(r.mc.p90) : "—", r.mc ? `median ${inr(r.mc.p50)} · P(loss) ${pr(r.mc.pLoss)} · max drawdown ${inr(r.maxDrawdown)}` : "")
     + `</div><div class="grid two"><div class="panel"><h2>Cumulative expected net P&amp;L</h2>${lineChart(r.equity, { label: "equity curve" })}</div>`
-    + `<div class="panel"><h2>Capital blocked (expected)</h2>${lineChart(r.blocked, { area: true, label: "capital blocked" })}</div></div>`
-    + `<div class="panel"><h2>By financial year</h2><div class="scroll"><table><thead><tr><th>FY</th><th>IPOs</th><th>Net P&amp;L (pre-tax)</th></tr></thead><tbody>`
-    + r.byFy.map((f) => `<tr><td>${f.fy}</td><td class="num">${f.n}</td><td class="num ${cls(f.net)}">${inr(f.net)}</td></tr>`).join("") + "</tbody></table></div></div>";
+    + `<div class="panel"><h2>Capital blocked (expected)</h2>${lineChart(r.blocked, { area: true, label: "capital blocked" })}</div></div>`;
+}
+
+function barRows(items, opt = {}) {
+  const mx = Math.max(10, ...items.map((b) => Math.abs(b.avgGain || 0)));
+  return items.map((b) => {
+    const v = b.avgGain, w = v == null ? 0 : Math.min(50, Math.abs(v) / mx * 50);
+    const fill = v == null ? "" : v < 0 ? `right:50%;left:auto;width:${w}%;background:var(--bad)` : `left:50%;width:${w}%;background:var(--good)`;
+    return `<div class="brow ${b.n < 5 ? "thin" : ""}"><span>${esc(b.label)}<br><span class="sub">n=${b.n}</span></span>`
+      + `<div class="bar mid"><i style="${fill}"></i></div>`
+      + `<span class="num" style="text-align:right">${b.n ? pc(b.avgGain, 0) + `<br><span class="sub">${pr(b.posRate)} up · med ${pc(b.medianGain, 0)}</span>` : "—"}</span></div>`;
+  }).join("") || '<div class="sub">No data</div>';
+}
+
+function renderDist() {
+  const tr = tabRows(), d = B.distribution(tr), mx = Math.max(1, ...d.map((x) => x.n));
+  $("dist").innerHTML = d.map((x) => `<div class="brow"><span>${x.label}</span><div class="bar"><i style="width:${x.n / mx * 100}%;background:${x.hi <= 0 ? "var(--bad)" : "var(--accent)"}"></i></div>`
+    + `<span class="num" style="text-align:right">${x.n} <span class="sub">${pr(x.share)}</span></span></div>`).join("");
+  $("tape").innerHTML = barRows(B.monthly(tr));
+}
+
+function renderFactors() {
+  const tr = tabRows();
+  const sect = B.byKey(tr, "sector", 3).slice(0, 8);
+  const panel = (title, items) => `<div><h2 style="font-size:12px;color:var(--ink3)">${title}</h2>${barRows(items)}</div>`;
+  $("factors").innerHTML = panel("Listing-eve GMP", B.byBucket(tr, "gmp")) + panel("Final subscription", B.byBucket(tr, "sub"))
+    + panel("Issue size", B.byBucket(tr, "size")) + panel("InvestorGain rating", B.byBucket(tr, "rating"))
+    + `<div style="grid-column:1/-1">${panel("Sector (3+ IPOs)", sect)}</div>`;
 }
 
 function renderCal() {
-  const c = B.calibration(ROWS, $("calMode").value);
+  const c = B.calibration(tabRows(), $("calMode").value);
   if (!c.n || c.n < 3) { $("cal").innerHTML = '<div class="sub">Not enough IPOs with this signal yet.</div>'; return; }
   const mx = Math.max(10, ...c.buckets.flatMap((b) => [Math.abs(b.avgGmp || 0), Math.abs(b.avgGain || 0)]));
   const bar = (v, color) => `<div class="bar"><i style="width:${Math.min(100, Math.abs(v || 0) / mx * 100)}%;background:${v < 0 ? "var(--bad)" : color}"></i></div>`;
   $("cal").innerHTML = `<div class="sub" style="margin-bottom:8px">n = ${c.n} · correlation ${c.corr == null ? "—" : c.corr.toFixed(2)} · bias ${pc(c.bias)} pts (GMP minus actual) · typical miss ${c.mae.toFixed(1)} pts</div>`
-    + c.buckets.map((b) => `<div class="barrow"><span>${b.label}<br><span class="sub">n=${b.n}</span></span><div>${bar(b.avgGmp, "var(--ink3)")}${bar(b.avgGain, "var(--accent)")}</div>`
-      + `<span class="num sub">${b.n ? pc(b.avgGmp, 0) + " → " + pc(b.avgGain, 0) : ""}<br>${b.n ? (b.posRate * 100).toFixed(0) + "% up" : ""}</span></div>`).join("")
+    + c.buckets.map((b) => `<div class="brow"><span>${b.label}<br><span class="sub">n=${b.n}</span></span><div>${bar(b.avgGmp, "var(--ink3)")}${bar(b.avgGain, "var(--accent)")}</div>`
+      + `<span class="num sub" style="text-align:right">${b.n ? pc(b.avgGmp, 0) + " → " + pc(b.avgGain, 0) : ""}<br>${b.n ? pr(b.posRate) + " up" : ""}</span></div>`).join("")
     + `<div class="sub" style="margin-top:6px">Grey bar = average GMP, brown bar = average actual listing gain, per GMP bucket.</div>`;
 }
 
 function renderLedger() {
-  const s = RESULTS[SEL] ? RESULTS[SEL].strat : {};
+  const s = STRATS[SEL] || {};
   const rows = ROWS.filter((r) => B.pass(r, s)).slice().reverse();
-  $("ledgerNote").textContent = `(${rows.length} IPOs in selected strategy, newest first; showing 150)`;
-  $("ledger").innerHTML = "<thead><tr>" + ["IPO", "Seg", "Bid", "Price", "GMP @close", "P(allot)", "Listing gain", "Net / allotment", "Days"].map((h) => `<th>${h}</th>`).join("") + "</tr></thead><tbody>"
-    + rows.slice(0, 150).map((r) => `<tr class="num"><td style="font-family:inherit">${esc(r.name)}</td><td>${r.segment}</td><td>${r.bid}</td><td>${inr(r.price)}</td>`
-      + `<td>${r.sigKind ? pc(r.gmpPct) + (r.sigKind === "post" ? " (T+1)" : "") : "—"}</td><td>${(r.p * 100).toFixed(0)}%${r.pKnown ? "" : "*"}</td>`
+  $("ledgerNote").textContent = `(${rows.length} IPOs in the selected strategy, newest first; showing 150)`;
+  $("ledger").innerHTML = "<thead><tr>" + ["IPO", "Seg", "Sector", "Bid", "Price", "First GMP", "GMP @close", "Final sub", "P(allot)", "Listing gain", "Net / allotment", "Days"].map((h) => `<th>${h}</th>`).join("") + "</tr></thead><tbody>"
+    + rows.slice(0, 150).map((r) => `<tr class="num"><td style="font-family:inherit">${esc(r.name)}</td><td>${r.segment === "SME" ? "SME" : "Main"}</td><td style="font-family:inherit">${esc(r.sector || "—")}</td><td>${r.bid}</td><td>${inr(r.price)}</td>`
+      + `<td>${r.gmpFirstPct == null ? "—" : pc(r.gmpFirstPct)}</td><td>${r.sigKind ? pc(r.gmpPct) : "—"}</td><td>${r.subClose == null ? "—" : r.subClose + "x"}</td><td>${pr(r.p)}${r.pKnown ? "" : "*"}</td>`
       + `<td class="${cls(r.gainPct)}">${pc(r.gainPct)}</td><td class="${cls(r.netAllot)}">${inr(r.netAllot)}</td><td>${r.dRefund}/${r.dAllot}</td></tr>`).join("") + "</tbody>";
 }
 
 document.addEventListener("input", (e) => {
   const el = e.target;
-  if (el.dataset.k) U[el.dataset.k] = el.type === "number" ? el.value : el.value;
+  if (el.dataset.k) U[el.dataset.k] = el.value;
   else if (el.dataset.c) U[el.dataset.c] = el.checked;
   else if (el.dataset.x) custom[el.dataset.x] = el.value;
   else return;
-  try { localStorage.setItem("ipo-bt-prefs", JSON.stringify(U)); } catch (err) {}
+  try { localStorage.setItem("ipo-bt-prefs2", JSON.stringify(U)); } catch (err) {}
   compute();
 });
 document.addEventListener("click", (e) => {
+  const tab = e.target.closest("[data-tab]");
+  if (tab) { TAB = tab.dataset.tab; SEL = 0; try { localStorage.setItem("ipo-bt-tab", TAB); } catch (err) {} compute(); return; }
   const tr = e.target.closest("tr[data-i]");
   if (tr) { SEL = +tr.dataset.i; render(toCfg()); }
 });
 $("calMode").addEventListener("change", renderCal);
 $("csvBtn").addEventListener("click", () => {
-  const s = RESULTS[SEL] ? RESULTS[SEL].strat : {};
-  const blob = new Blob([B.csv(ROWS.filter((r) => B.pass(r, s)))], { type: "text/csv" });
+  const blob = new Blob([B.csv(ROWS.filter((r) => B.pass(r, STRATS[SEL] || {})))], { type: "text/csv" });
   const a = document.createElement("a"); a.href = URL.createObjectURL(blob); a.download = "ipo-backtest-ledger.csv"; a.click();
   setTimeout(() => URL.revokeObjectURL(a.href), 2000);
 });
 
-renderForm();
+renderStatic();
 fetch("archive.json?t=" + Date.now(), { cache: "no-store" }).then((r) => r.json()).then((d) => { RECORDS = d.records || []; compute(); })
   .catch((e) => { $("coverage").textContent = "Could not load archive.json (" + e + ")"; });
 </script>

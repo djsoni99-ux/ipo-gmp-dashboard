@@ -107,10 +107,29 @@ def parse(i: int, h: str):
         sub = re.search(r"Sub:\s*([\d.]+)x", rest)
         raw.append(dict(d=int(m.group(1)), m=MON[m.group(2)], gmp=fnum(g.group(1)) if g else None,
                         mk=set(re.findall(r"\b([OCA])\b", rest)), lp=lst, sub=float(sub.group(1)) if sub else None))
-    if len(raw) < 2 or price is None or seg is None or not anchors:
-        return None, "no-rows" if len(raw) < 2 else "no-price/segment/year"
+    # Narrative + metrics are present even on paywalled pages: final subscription, sector, rating, GMP summary.
+    flat = re.sub(r"\s+", " ", html.unescape(body))
+    hdm = HEADER.search(flat)
+    if len(raw) < 1 or price is None or seg is None or not (anchors or hdm):
+        return None, "no-rows" if len(raw) < 1 else "no-price/segment/year"
+    g1 = lambda p: (re.search(p, flat) or [None, None])[1]  # noqa: E731
+    nl = re.search(r"listed at a price of ₹\s*([\d,.]+), which is ([\d.]+)% (higher|lower)", flat)
+    sub_final = fnum(g1(r"was subscribed ([\d.]+)x"))
+    sector = (g1(r"([^|]{1,160}) \| (?:SME IPO|IPO) \|") or "").split("Today & History ")[-1].strip() or None
+    rating = fnum(g1(r"Rated ([\d.]+) ?/5"))
+    metrics = {}
+    for t in tabs:
+        if "Trend Direction" in t:
+            for tr in re.findall(r"<tr\b.*?</tr>", t, re.S):
+                c = [txt(x) for x in re.findall(r"<t[dh]\b.*?</t[dh]>", tr, re.S)]
+                if len(c) >= 2:
+                    metrics[c[0]] = c[1]
     # year anchoring: newest row == latest JSON-LD date; walk back, month increase => previous year
-    a = date.fromisoformat(anchors[-1])
+    if anchors:
+        a = date.fromisoformat(anchors[-1])
+    else:  # fall back to the header's listing (or closing) date
+        g = hdm.groups()
+        a = date(int(g[8]), MON[g[7]], int(g[6])) if g[6] else date(int(g[5]), MON[g[4]], int(g[3]))
     y = a.year if (raw[0]["m"], raw[0]["d"]) <= (a.month, a.day) else a.year - 1
     prev_m = raw[0]["m"]
     rows = []
@@ -134,7 +153,7 @@ def parse(i: int, h: str):
     opened = mk("O") or (days[0] if days else None)
     # The page header states exact dates ("Opened - 25th Sep 2025 Closed - 29th Sep 2025 Listed - 3rd Oct 2025"),
     # even on paywalled pages; prefer them to the marker-derived ones.
-    hd = HEADER.search(re.sub(r"\s+", " ", body))
+    hd = hdm
     if hd:
         g = hd.groups()
         dt = lambda d, m, y: date(int(y), MON[m], int(d))  # noqa: E731
@@ -161,8 +180,14 @@ def parse(i: int, h: str):
         "gmp_post": by_day[post]["gmp"] if post else None,
         "gmp_list": by_day[listing]["gmp"] if listing in by_day else None,
         "sub_close": by_day[close]["sub"] if close in by_day else None,
-        "listing_price": float(lp["lp"].group(1).replace(",", "")) if lp else None,
-        "listing_gain_pct": float(lp["lp"].group(2)) if lp else None,
+        "sub_final": sub_final, "sector": sector, "rating": rating,
+        "gmp_first": fnum(metrics.get("First GMP")), "gmp_range": fnum(metrics.get("GMP Range")),
+        "gmp_slope": fnum(metrics.get("Trend Slope")), "gmp_pos": fnum(metrics.get("Positive Sessions")),
+        "gmp_neg": fnum(metrics.get("Negative Sessions")), "gmp_trend": metrics.get("Trend Direction"),
+        "listing_price": float(lp["lp"].group(1).replace(",", "")) if lp
+        else float(nl.group(1).replace(",", "")) if nl else None,
+        "listing_gain_pct": float(lp["lp"].group(2)) if lp
+        else (float(nl.group(2)) * (1 if nl.group(3) == "higher" else -1)) if nl else None,
         "series": [[d.isoformat(), by_day[d]["gmp"]] for d in days],
     }
     return rec, None
@@ -175,8 +200,10 @@ def merge_snapshot(recs: dict) -> None:
     for p in json.loads(SNAP.read_text("utf-8")).get("ipos", []):
         r = recs.get(p.get("ig_id"))
         if r:
-            for src, dst in (("lot", "lot"), ("issue_size_cr", "issue_size_cr"), ("subscription_x", "sub_final"), ("exchange", "exchange")):
-                if p.get(src) is not None:
+            for src, dst in (("lot", "lot"), ("issue_size_cr", "issue_size_cr"), ("subscription_x", "sub_final"),
+                             ("exchange", "exchange"), ("fresh_cr", "fresh_cr"), ("ofs_cr", "ofs_cr"),
+                             ("lead_manager", "lead_manager"), ("pe", "pe"), ("anchor", "anchor")):
+                if p.get(src) is not None and (dst != "sub_final" or r.get("sub_final") is None):
                     r[dst] = p[src]
 
 
@@ -234,7 +261,9 @@ def main() -> int:
         ids = [i for i in range(lo, hi + 1) if not (i in recs and recs[i].get("listing_price") is not None) and i not in skipped]
         print(f"backfill {lo}-{hi}: {len(ids)} ids to scan", flush=True)
     elif a.refresh:
-        ids = sorted(i for i, r in recs.items() if not r.get("limited") or not r.get("dates_exact"))
+        lo = min(recs) if recs else 0  # re-parse every record plus pages once dropped for having too few rows
+        retry = {"no-rows", "no-price/segment/year", "http"}
+        ids = sorted(set(recs) | {i for i, why in skipped.items() if why in retry and i >= lo - 100})
         print(f"refresh: {len(ids)} records", flush=True)
     else:
         unfinished = [i for i, r in recs.items() if r.get("listing_price") is None]

@@ -100,4 +100,52 @@ t("financial year labels", () => {
   assert.equal(B.fyOf("2026-04-01"), "FY26-27");
 });
 
+t("per-segment slippage: SME exits lower than mainboard on the same listing", () => {
+  const sme = Object.assign({}, A, { id: 20, segment: "SME" });
+  const cfg = { applyTax: false, mcRuns: 0 }; // defaults: Mainboard 0.5%, SME 2%
+  const [m, s] = [B.ledger([A], cfg)[0], B.ledger([sme], cfg)[0]];
+  near(m.sell / m.shares, 130 * 0.995, 1e-9);
+  near(s.sell / s.shares, 130 * 0.98, 1e-9);
+});
+
+t("distribution + buckets + monthly partition the listed IPOs", () => {
+  const mk = (id, gain, gmp, sub, close, listing) => Object.assign({}, A, { id, listing_price: 100 * (1 + gain / 100), listing_gain_pct: gain,
+    gmp_list: gmp, sub_final: sub, close, listing });
+  const rows = B.ledger([mk(30, -25, 0, 0.8, "2026-01-05", "2026-01-08"), mk(31, 5, 8, 2, "2026-01-12", "2026-01-15"),
+    mk(32, 40, 30, 20, "2026-02-02", "2026-02-05"), mk(33, 120, 60, 150, "2026-02-09", "2026-02-12")], { mcRuns: 0 });
+  const d = B.distribution(rows);
+  assert.equal(d.reduce((s, b) => s + b.n, 0), 4);
+  assert.equal(d.find((b) => b.label === "< -20%").n, 1);
+  assert.equal(d.find((b) => b.label === "> 100%").n, 1);
+  assert.equal(B.byBucket(rows, "gmp").reduce((s, b) => s + b.n, 0), 4);
+  assert.equal(B.byBucket(rows, "sub").reduce((s, b) => s + b.n, 0), 4);
+  const mo = B.monthly(rows);
+  assert.deepEqual(mo.map((x) => x.label), ["2026-01", "2026-02"]);
+  near(mo[0].avgGain, (-25 + 5) / 2, 1e-9);
+  near(mo[0].posRate, 0.5, 1e-12);
+});
+
+t("similar(): widens tolerance until enough comparables, flags thin samples", () => {
+  const recs = Array.from({ length: 10 }, (_, i) => Object.assign({}, A, { id: 40 + i, gmp_list: 10 + i, listing_gain_pct: 10 + i }));
+  const rows = B.ledger(recs, { mcRuns: 0 });
+  const s = B.similar(rows, "Mainboard", 14, 8);
+  assert.ok(s.n >= 8 && !s.thin);
+  assert.equal(B.similar(rows, "SME", 14, 8).n, 0);
+});
+
+t("loss-rate metrics on the selected strategy", () => {
+  const mk = (id, gain) => Object.assign({}, A, { id, sub_final: 1, listing_price: 100 * (1 + gain / 100), listing_gain_pct: gain });
+  const cfg = { mcRuns: 0, applyTax: false };
+  const o = B.run(B.ledger([mk(50, -20), mk(51, 10), mk(52, 30), mk(53, 0)], cfg), {}, cfg);
+  near(o.lossRate, 0.25, 1e-12); near(o.deepLossRate, 0.25, 1e-12); near(o.bigWinRate, 0.25, 1e-12);
+});
+
+t("odds-weighted gain exposes adverse selection", () => {
+  const mk = (id, sub, gain) => Object.assign({}, A, { id, sub_final: sub, listing_price: 100 * (1 + gain / 100), listing_gain_pct: gain });
+  const cfg = { mcRuns: 0, applyTax: false };
+  const o = B.run(B.ledger([mk(60, 1, 0), mk(61, 10, 100)], cfg), {}, cfg); // p = 1 and 0.1
+  near(o.avgGainPct, 50, 1e-9);                       // simple average flatters
+  near(o.weightedGainPct, (1 * 0 + 0.1 * 100) / 1.1, 1e-9); // what you would actually get
+});
+
 console.log(`\n${passed} tests passed`);

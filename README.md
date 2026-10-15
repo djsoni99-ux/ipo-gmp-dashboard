@@ -51,6 +51,29 @@ Limits: old InvestorGain pages are paywalled to the last 3 GMP readings, so they
 close-day GMP. GMP filters only use close-day GMP (point-in-time); the sample of those grows ~40 IPOs/month.
 Backfill from Actions: run **Update backtest archive** with `lo`/`hi` ids.
 
+## What the dashboard adds beyond a GMP table
+
+- **Decision cards** for open / upcoming IPOs: GMP, subscription meter with allotment odds (~1 in N), expected value
+  per application (odds-weighted, after charges), and **historical evidence** - how similar IPOs (same segment, similar
+  listing-eve GMP) listed over the last 13 months, with the sample size shown and a "thin evidence" flag.
+- **Red-flag chips**: no premium, GMP falling, sources disagree, under-subscribed on last day, mostly offer-for-sale,
+  very small SME issue, high P/E; plus anchor/rating positives.
+- **Capital planner**, **listing tape**, **segment toggle** (All / Mainboard / SME), recently-listed table with GMP miss.
+- **Backtest** with separate SME and mainboard tabs, factor panels (GMP, subscription, issue size, rating, sector),
+  gain distribution, monthly tape, and an **odds-weighted gain** ("what you would actually receive").
+
+## Research notes
+
+- Reviewed *pre-ipo-readiness-assessment* (mcpmarket) and *ipogrid-ipo-research-skill* (q32llc). Both target US issuers
+  (SOX/COSO readiness; SEC filings via a paid MCP), so no data or scoring was reused. What transferred is method:
+  separate high-signal from low-signal inputs, compare with similar deals while stating the sample size, report
+  day-one and downside separately, and never force a conclusion when data is thin.
+- Published work on Indian IPOs consistently finds GMP and subscription drive retail demand and that SME issues are
+  more speculative and volatile than mainboard; no free dataset gives listing-day gains regressed on issue structure,
+  so this project measures it from its own archive instead of quoting studies.
+- Key measured effect: **adverse selection**. Allotment odds fall as demand rises, so the average listing gain of all
+  IPOs overstates what a retail applicant receives. The backtest reports both.
+
 ## Run locally
 
 ```bash

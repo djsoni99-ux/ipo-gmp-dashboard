@@ -20,7 +20,7 @@
     allot: { Mainboard: 0.25, SME: 0.08 },     // P(allotment) when subscription is unknown (hot IPOs are lower: see notes)
     useSub: true,                              // else P = min(1, 1 / final subscription)
     allowPost: false,                          // let GMP filters fall back to the T+1 GMP
-    slippagePct: 0.5,                          // exit slightly below the listing price
+    slippagePct: { Mainboard: 0.5, SME: 2 },   // exit below the listing price (SME: circuits, thin books); scalar also OK
     brokerage: 20, dpCharge: 15.93,            // flat Rs per sale
     sttPct: 0.1, exchPct: 0.00325, sebiPct: 0.0001, gstPct: 18, stampBuyPct: 0,
     applyTax: true, taxPct: 20.8,              // STCG 20% + 4% cess, netted per financial year
@@ -63,7 +63,8 @@
       const listing = r.listing || addWd(bid, 3);
       const shares = Math.max(1, Math.floor(cfg.ticket[seg] / r.price));
       const invested = shares * r.price;
-      const sell = shares * r.listing_price * (1 - cfg.slippagePct / 100);
+      const slip = typeof cfg.slippagePct === "object" ? cfg.slippagePct[seg] : cfg.slippagePct;
+      const sell = shares * r.listing_price * (1 - slip / 100);
       const exch = sell * cfg.exchPct / 100, sebi = sell * cfg.sebiPct / 100;
       const charges = cfg.brokerage + exch + sebi + (cfg.brokerage + exch + sebi) * cfg.gstPct / 100
         + sell * cfg.sttPct / 100 + invested * cfg.stampBuyPct / 100 + cfg.dpCharge;
@@ -76,7 +77,10 @@
         price: r.price, shares, invested, sell, charges, gross: sell - invested, netAllot: sell - invested - charges,
         gainPct: r.listing_gain_pct, p: known ? Math.min(1, 1 / r.sub_final) : cfg.allot[seg], pKnown: known,
         sigKind, gmpPct: sig == null ? null : sig / r.price * 100, gmpList: r.gmp_list,
-        subClose: r.sub_close, size: r.issue_size_cr, limited: !!r.limited,
+        subClose: r.sub_final != null ? r.sub_final : r.sub_close, size: r.issue_size_cr, limited: !!r.limited,
+        sector: r.sector || null, rating: r.rating, exchange: r.exchange || null, month: listing.slice(0, 7),
+        gmpFirstPct: r.gmp_first == null ? null : r.gmp_first / r.price * 100, gmpPos: r.gmp_pos, gmpSlope: r.gmp_slope,
+        ofsShare: r.ofs_cr != null && r.issue_size_cr ? r.ofs_cr / r.issue_size_cr * 100 : null, lead: r.lead_manager || null,
         dAllot: dn(release) - dn(bid), dRefund: dn(refund) - dn(bid),
       });
     }
@@ -88,7 +92,10 @@
     if (s.from && r.bid < s.from) return false;
     if (s.to && r.bid > s.to) return false;
     if (s.minGmpPct != null && (r.sigKind == null || r.gmpPct < s.minGmpPct)) return false;
-    if (s.minSub != null && !(r.subClose >= s.minSub)) return false;
+    if (s.minFirstGmpPct != null && !(r.gmpFirstPct >= s.minFirstGmpPct)) return false; // first-quoted GMP: known before bidding
+    if (s.minSub != null && !(r.subClose >= s.minSub)) return false;   // final subscription (known as bidding closes)
+    if (s.maxSub != null && !(r.subClose <= s.maxSub)) return false;
+    if (s.minRating != null && !(r.rating >= s.minRating)) return false;
     if (s.minSize != null && !(r.size >= s.minSize)) return false;
     return true;
   }
@@ -157,6 +164,14 @@
       avgGainPct: gains.length ? sum(gains, (x) => x) / gains.length : null, medianGainPct: q(gains, 0.5),
       bestGainPct: gains.length ? gains[gains.length - 1] : null, worstGainPct: gains.length ? gains[0] : null,
       winRate: allotted.filter((x) => x > 0).length / allotted.length,
+      // average listing gain of the shares you would actually receive (weights each IPO by its allotment odds)
+      weightedGainPct: (() => {
+        const w = sel.filter((r) => r.gainPct != null), tw = sum(w, (r) => r.p);
+        return tw ? sum(w, (r) => r.p * r.gainPct) / tw : null;
+      })(),
+      lossRate: gains.filter((x) => x < 0).length / Math.max(1, gains.length),
+      deepLossRate: gains.filter((x) => x <= -10).length / Math.max(1, gains.length),
+      bigWinRate: gains.filter((x) => x >= 25).length / Math.max(1, gains.length),
       maxDrawdown: maxDD, equity: eq,
       blocked: days.map((d) => [iso(d), tl.get(d)]),
       byFy: Object.keys(fyNet).sort().map((k) => ({ fy: k, net: fyNet[k], n: sel.filter((r) => r.fy === k).length })),
@@ -182,11 +197,63 @@
       mae: sum(pts, (x) => Math.abs(x.g - x.a)) / n, buckets };
   }
 
+  // ---- factor analytics (descriptive: applied, sold on listing day) ----
+  const median = (a) => { const s = a.slice().sort((x, y) => x - y); return q(s, 0.5); };
+  function stats(list) {
+    const g = list.map((r) => r.gainPct).filter((x) => x != null);
+    return { n: list.length, avgGain: g.length ? sum(g, (x) => x) / g.length : null, medianGain: g.length ? median(g) : null,
+      posRate: g.length ? g.filter((x) => x > 0).length / g.length : null,
+      avgNet: list.length ? sum(list, (r) => r.netAllot) / list.length : null,
+      avgP: list.length ? sum(list, (r) => r.p) / list.length : null };
+  }
+  const HIST = [[-Infinity, -20, "< -20%"], [-20, -10, "-20 to -10"], [-10, 0, "-10 to 0"], [0, 10, "0 to 10"],
+    [10, 25, "10 to 25"], [25, 50, "25 to 50"], [50, 100, "50 to 100"], [100, Infinity, "> 100%"]];
+  function distribution(rows) {
+    const g = rows.map((r) => r.gainPct).filter((x) => x != null);
+    return HIST.map(([lo, hi, label]) => { const n = g.filter((x) => x >= lo && x < hi).length; return { label, n, share: g.length ? n / g.length : 0, lo, hi }; });
+  }
+  const BUCKETS = {
+    gmp: [["<= 0%", (r) => r.gmpList != null && r.gmpList / r.price * 100 <= 0], ["0-10%", (r) => r.gmpList / r.price * 100 > 0 && r.gmpList / r.price * 100 < 10],
+      ["10-25%", (r) => r.gmpList / r.price * 100 >= 10 && r.gmpList / r.price * 100 < 25], ["25-50%", (r) => r.gmpList / r.price * 100 >= 25 && r.gmpList / r.price * 100 < 50],
+      ["> 50%", (r) => r.gmpList / r.price * 100 >= 50]],
+    sub: [["< 1x", (r) => r.subClose < 1], ["1-3x", (r) => r.subClose >= 1 && r.subClose < 3], ["3-10x", (r) => r.subClose >= 3 && r.subClose < 10],
+      ["10-50x", (r) => r.subClose >= 10 && r.subClose < 50], ["50-100x", (r) => r.subClose >= 50 && r.subClose < 100], ["> 100x", (r) => r.subClose >= 100]],
+    size: [["< 50 Cr", (r) => r.size < 50], ["50-250 Cr", (r) => r.size >= 50 && r.size < 250], ["250-1000 Cr", (r) => r.size >= 250 && r.size < 1000], ["> 1000 Cr", (r) => r.size >= 1000]],
+    rating: [["<= 2.5", (r) => r.rating <= 2.5], ["3-3.5", (r) => r.rating >= 3 && r.rating <= 3.5], ["4+", (r) => r.rating >= 4]],
+  };
+  function byBucket(rows, kind) {
+    return (BUCKETS[kind] || []).map(([label, fn]) => Object.assign({ label }, stats(rows.filter((r) => { try { return fn(r) === true; } catch (e) { return false; } }))));
+  }
+  function byKey(rows, key, minN) {
+    const m = new Map();
+    for (const r of rows) { const k = r[key]; if (k == null || k === "") continue; if (!m.has(k)) m.set(k, []); m.get(k).push(r); }
+    return [...m.entries()].map(([label, l]) => Object.assign({ label }, stats(l))).filter((x) => x.n >= (minN || 1)).sort((a, b) => b.n - a.n);
+  }
+  function monthly(rows) {
+    return byKey(rows, "month").sort((a, b) => a.label < b.label ? -1 : 1);
+  }
+  // Evidence for a live IPO: listed IPOs of the same segment with a similar listing-eve GMP %.
+  function similar(rows, seg, gmpPct, minN) {
+    minN = minN || 8;
+    const pool = rows.filter((r) => r.segment === seg && r.gmpList != null && r.gainPct != null);
+    for (const tol of [4, 8, 15, 30]) {
+      const m = pool.filter((r) => Math.abs(r.gmpList / r.price * 100 - gmpPct) <= tol);
+      if (m.length >= minN || tol === 30) {
+        const g = m.map((r) => r.gainPct).sort((a, b) => a - b);
+        return { n: m.length, tol, avg: g.length ? sum(g, (x) => x) / g.length : null, median: q(g, 0.5),
+          posRate: g.length ? g.filter((x) => x > 0).length / g.length : null, p10: q(g, 0.1), p90: q(g, 0.9),
+          thin: m.length < minN };
+      }
+    }
+    return { n: 0, thin: true };
+  }
+
   function csv(rows) {
     const cols = ["id", "name", "segment", "bid", "listing", "price", "shares", "invested", "p", "sigKind", "gmpPct", "gainPct", "gross", "charges", "netAllot", "dAllot", "dRefund"];
     const f = (v) => v == null ? "" : typeof v === "number" ? String(Math.round(v * 100) / 100) : '"' + String(v).replace(/"/g, '""') + '"';
     return [cols.join(",")].concat(rows.map((r) => cols.map((c) => f(r[c])).join(","))).join("\n");
   }
 
-  return { DEFAULTS, PRESETS, ledger, run, calibration, csv, addWd, fyOf, pass };
+  return { DEFAULTS, PRESETS, ledger, run, calibration, csv, addWd, fyOf, pass,
+    stats, distribution, byBucket, byKey, monthly, similar };
 });
