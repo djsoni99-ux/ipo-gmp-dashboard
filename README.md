@@ -3,12 +3,14 @@
 Live grey-market-premium board for Indian mainboard + SME IPOs. Static page on GitHub Pages,
 data refreshed by a GitHub Actions cron. **Zero LLM tokens in steady state.**
 
+**Docs:** [Wiki](https://github.com/djsoni99-ux/ipo-gmp-dashboard/wiki) (roadmap, current status, how it works, FAQ) · [Guide](https://djsoni99-ux.github.io/ipo-gmp-dashboard/guide.html) · [Security policy](SECURITY.md)
+
 ```
 index.html        the dashboard (vanilla JS, no build step)
 ipo.json          latest merged snapshot  (written by the Action)
 history.json      GMP change log for the trend line  (written by the Action)
 fetch_ipo.py      stdlib-only fetcher / merger
-.github/workflows/refresh.yml   cron: every 30 min, 07:30-23:30 IST
+.github/workflows/refresh.yml   cron: hourly 07:30-22:30 IST, plus 02:00 IST
 ```
 
 ## How "live" works
