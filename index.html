@@ -385,6 +385,9 @@ function card(p, t) {
   const sc = c.scenarios;
   const odds = c.odds;
   const oddsTxt = odds.p >= 0.999 ? "~certain" : "1 in " + odds.oneIn;
+  const lo = ins.price_low || p.price_low, hi = ins.price_high || p.price_high || p.price;
+  const band = lo && hi && lo !== hi ? inr(lo) + "–" + inr(hi).slice(1) : hi ? inr(hi) + (p.st === "closed" ? " issue price" : "") : null;
+  const est = p.price && p.gmp != null ? inr(p.price + p.gmp) : null;
   const pe = ins.loss_making ? "loss-making" : ins.pe_post ? ins.pe_post.toFixed(0) + "x P/E" : null;
   const reasons = c.reasons.slice(0, 5).map((r) => `<li><span class="i ${r.kind === "+" ? "p" : "m"}">${r.kind === "+" ? "+" : "−"}</span><span>${esc(r.t)}</span></li>`).join("")
     || '<li><span class="i p">·</span><span class="muted">Not enough data for reasons yet.</span></li>';
@@ -392,7 +395,7 @@ function card(p, t) {
   const subLine = sub.qib != null ? `QIB ${sub.qib}x · NII ${sub.nii}x · Retail ${sub.retail}x` : p.subscription_x != null ? `Total ${p.subscription_x}x` : "Not open yet";
   return `<article class="card ${c.verdict}">
     <div class="c-top"><div><span class="vb v-${c.verdict}">${D.LABEL[c.verdict]}</span><div class="c-name" style="margin-top:8px">${esc(p.name)}</div>
-      <div class="c-meta"><span class="tag ${sme ? "t-sme" : "t-main"}">${sme ? esc(p.exchange || "SME") : "Mainboard"}</span><span class="when ${p.close === t && p.st === "open" ? "hot" : ""}">${esc(when)}</span>${pe ? `<span>${esc(pe)}</span>` : ""}</div></div>
+      <div class="c-meta"><span class="tag ${sme ? "t-sme" : "t-main"}">${sme ? esc(p.exchange || "SME") : "Mainboard"}</span><span class="when ${p.close === t && p.st === "open" ? "hot" : ""}">${esc(when)}</span>${band ? `<span>Band <b class="num">${band}</b></span>` : ""}${est ? `<span>Est. listing <b class="num">${est}</b></span>` : ""}${pe ? `<span>${esc(pe)}</span>` : ""}</div></div>
       <div style="text-align:center">${ring(c.score)}<div class="sub" style="font-size:10.5px">confidence ${pr(c.confidence)}</div></div></div>
     <div class="kpis">
       <div class="kpi"><div class="l">GMP</div><div class="v">${p.gmp == null ? "—" : inr(p.gmp)}</div><div class="h">${p.pctv == null ? "none yet" : pc(p.pctv) + (p.trend > 0 ? " ▲" : p.trend < 0 ? " ▼" : "")}</div></div>

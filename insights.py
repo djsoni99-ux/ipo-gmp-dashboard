@@ -65,6 +65,9 @@ def parse_detail(h: str) -> dict:
     d: dict = {}
     basics = kv(find(tabs, "IPO Date") or next((t for t in tabs if any(r and r[0] == "Price Band" for r in t)), None))
     d["lot"] = num(basics.get("Lot Size"))
+    band = [float(x.replace(",", "")) for x in re.findall(r"₹\s*([\d,]+(?:\.\d+)?)", basics.get("Price Band") or basics.get("Issue Price") or "")]
+    if band:
+        d["price_low"], d["price_high"] = band[0], band[-1]
     d["sale_type"] = basics.get("Sale Type")
     size = kv(next((t for t in tabs if any(r and r[0].startswith("Total Issue Size") for r in t)), None))
     amt = lambda s: num((re.search(r"₹\s*([\d,.]+)\s*Cr", s or "") or [None, None])[1])  # noqa: E731
